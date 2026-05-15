@@ -63,7 +63,7 @@ export default function StatistiquesClient({ releves, frequentations, interventi
 
   const years = useMemo(() => {
     const all = [...releves.map(r => r.date.slice(0, 4)), ...frequentations.map(f => f.date.slice(0, 4))]
-    return [...new Set(all)].sort().reverse()
+    return Array.from(new Set(all)).sort().reverse()
   }, [releves, frequentations])
 
   const [range, setRange]               = useState<Range>('mois')
