@@ -21,11 +21,13 @@ const CREATABLE_ROLES: Record<string, { value: string; label: string }[]> = {
     { value: 'responsable_etablissement', label: "Responsable d'Établissement" },
     { value: 'responsable_saisie', label: 'Responsable de Saisie' },
     { value: 'visualisateur', label: 'Auditeur' },
+    { value: 'controleur_ars', label: 'Contrôleur ARS' },
   ],
   admin: [
     { value: 'responsable_etablissement', label: "Responsable d'Établissement" },
     { value: 'responsable_saisie', label: 'Responsable de Saisie' },
     { value: 'visualisateur', label: 'Auditeur' },
+    { value: 'controleur_ars', label: 'Contrôleur ARS' },
   ],
   responsable_etablissement: [
     { value: 'responsable_saisie', label: 'Responsable de Saisie' },
@@ -108,6 +110,7 @@ export default function UsersClient() {
           { role: 'responsable_etablissement', desc: lang === 'fr' ? 'Modifier, supprimer (hors relevés), gérer utilisateurs' : 'Edit, delete (excl. records), manage users' },
           { role: 'responsable_saisie',        desc: lang === 'fr' ? 'Saisir et modifier les données' : 'Create and edit data' },
           { role: 'visualisateur',             desc: lang === 'fr' ? 'Consultation + statistiques uniquement' : 'Read-only + statistics' },
+          { role: 'controleur_ars',            desc: lang === 'fr' ? 'Accès lecture ARS — voit uniquement les relevés validés' : 'ARS read-only — validated records only' },
         ].map(r => (
           <div key={r.role} style={{ background: 'var(--surface2)', border: `1px solid ${roleColors[r.role]}44`, borderRadius: 10, padding: '12px 14px' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: roleColors[r.role], display: 'block', marginBottom: 4 }}>
