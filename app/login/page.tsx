@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import LoginForm from './LoginForm'
 
 export default function LoginPage() {
@@ -41,7 +42,9 @@ export default function LoginPage() {
           <p style={{ fontSize: 13, color: '#4aaace' }}>CIFEC — Accès sécurisé</p>
         </div>
 
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
 
         <p style={{ textAlign: 'center', fontSize: 11, color: '#aaa', marginTop: 24 }}>
           Arrêté du 26 mai 2021 — NOR:SSAP2004757A
