@@ -17,7 +17,7 @@ const helpContent: Record<string, { title: string; intro: string; sections: { ic
     intro: "Saisie et consultation des mesures qualité de l'eau — obligatoire selon l'arrêté du 26/05/2021.",
     sections: [
       { icon: '📅', title: 'Fréquence', text: 'Minimum une fois par jour, de préférence avant ouverture. En cas de forte fréquentation, un second relevé est recommandé.' },
-      { icon: '🧪', title: 'Paramètres', text: 'pH (7.1–7.6), Chlore libre (0.4–1.4 mg/L), Chlore combiné (<0.6 mg/L), Température eau (<30°C), TH (≥10°F), TAC (≥9°F).' },
+      { icon: '🧪', title: 'Paramètres', text: 'pH (7.1–7.6), Chlore libre (0.4–1.4 mg/L), Chlore combiné (<0.6 mg/L), Température eau (<30°C), TH (≥10°f), TAC (≥9°f).' },
       { icon: '🟢', title: 'Statut', text: 'Calculé automatiquement : Conforme (tous OK), Attention (valeurs limites), Non conforme (action corrective requise).' },
       { icon: '✏️', title: 'Saisie', text: 'Cliquez sur "Nouveau relevé", sélectionnez le bassin, saisissez les mesures. Le statut est calculé en temps réel.' },
     ],

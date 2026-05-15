@@ -14,8 +14,8 @@ const norms = [
   { label: 'Chlore libre', range: '0.4 – 1.4 mg/L' },
   { label: 'Chlore combiné', range: '< 0.6 mg/L' },
   { label: 'Température',  range: '≤ 30°C (couvert)' },
-  { label: 'TAC',          range: '≥ 9°F' },
-  { label: 'TH',           range: '≥ 10°F' },
+  { label: 'TAC',          range: '≥ 9°f' },
+  { label: 'TH',           range: '≥ 10°f' },
 ]
 
 interface Props {

@@ -157,7 +157,7 @@ export default async function PreviewReleves({
                   'T° eau', 'T° air',
                   'pH', 'Cl libre\n(mg/L)', 'Cl combiné\n(mg/L)', 'Cl total\n(mg/L)',
                   'Turbidité\n(NTU)', 'Redox\n(mV)',
-                  'TH (°F)', 'TAC (°F)',
+                  'TH (°f)', 'TAC (°f)',
                   'Cyanurate\n(mg/L)', 'Chlorure\n(mg/L)',
                   'Statut', 'Validation'
                 ].map(h => (

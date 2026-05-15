@@ -278,8 +278,8 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
           <div style={{ borderTop: '1px solid var(--border)', marginBottom: 16, paddingTop: 16 }}>
             <p style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Équilibre de l'eau</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 14 }}>
-              <Input label="TH" value={form.th} onChange={e => upd('th', e.target.value)} type="number" unit="°F" step={0.1} />
-              <Input label="TAC" value={form.tac} onChange={e => upd('tac', e.target.value)} type="number" unit="°F" step={0.1} />
+              <Input label="TH" value={form.th} onChange={e => upd('th', e.target.value)} type="number" unit="°f" step={0.1} />
+              <Input label="TAC" value={form.tac} onChange={e => upd('tac', e.target.value)} type="number" unit="°f" step={0.1} />
               {/* Cyanurate — affiché si traitement Chlore + bassin plein air */}
               {(bassins.find(b => String(b.id) === form.bassinId)?.traitementPrincipal === 'Chlore' &&
                 bassins.find(b => String(b.id) === form.bassinId)?.type === 'pleinair') && (
@@ -422,8 +422,8 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
                   <Metric label="Cl total" value={r.chloreTotal} unit="mg/L" />
                   <Metric label="Turbidité" value={r.turbidite} unit="NTU" status={r.turbidite !== null ? (r.turbidite <= 0.5 ? 'ok' : r.turbidite <= 1 ? 'warn' : 'bad') : undefined} />
                   {r.redox !== null && <Metric label="Redox" value={r.redox} unit="mV" status={r.redox >= 650 ? 'ok' : r.redox >= 600 ? 'warn' : 'bad'} />}
-                  <Metric label="TH" value={r.th} unit="°F" status={(r.th ?? 0) >= 10 ? 'ok' : 'warn'} />
-                  <Metric label="TAC" value={r.tac} unit="°F" status={(r.tac ?? 0) >= 9 ? 'ok' : 'warn'} />
+                  <Metric label="TH" value={r.th} unit="°f" status={(r.th ?? 0) >= 10 ? 'ok' : 'warn'} />
+                  <Metric label="TAC" value={r.tac} unit="°f" status={(r.tac ?? 0) >= 9 ? 'ok' : 'warn'} />
                   {r.cyanurate !== null && <Metric label="Cyanurate" value={r.cyanurate} unit="mg/L" status={(r.cyanurate ?? 0) <= 75 ? 'ok' : 'bad'} />}
                   {r.tauxChlorure !== null && <Metric label="Chlorure" value={r.tauxChlorure} unit="mg/L" />}
                   <Metric label="Vol. réactif" value={r.volumeReactif} unit="L" />
