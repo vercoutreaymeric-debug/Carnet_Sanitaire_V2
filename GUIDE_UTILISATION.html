@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guide d'utilisation — Carnet Sanitaire Numérique CIFEC</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f0f6fc;
+    color: #1a2e3b;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #00c4ff 0%, #0077aa 100%);
+    color: #fff;
+    padding: 48px 40px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200'%3E%3Cpath fill='rgba(255,255,255,0.06)' d='M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,85.3C672,75,768,85,864,96C960,107,1056,117,1152,112C1248,107,1344,85,1392,74.7L1440,64L1440,200L0,200Z'/%3E%3C/svg%3E") bottom/cover no-repeat;
+  }
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.18);
+    border-radius: 20px;
+    padding: 14px 28px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .header-logo span {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #fff;
+  }
+  .header h1 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .header p {
+    font-size: 15px;
+    opacity: 0.85;
+    position: relative;
+  }
+  .header .badge {
+    display: inline-block;
+    margin-top: 14px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 30px;
+    padding: 5px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── SOMMAIRE ── */
+  .toc-wrap {
+    max-width: 960px;
+    margin: 40px auto 0;
+    padding: 0 24px;
+  }
+  .toc {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,120,180,0.10);
+    padding: 32px 36px;
+  }
+  .toc h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0077aa;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toc h2::before { content: '☰'; font-size: 18px; }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .toc a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #1a2e3b;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    border: 1px solid transparent;
+  }
+  .toc a:hover {
+    background: #e8f6ff;
+    color: #0077aa;
+    border-color: #b3dff7;
+  }
+  .toc a .num {
+    background: linear-gradient(135deg, #00c4ff, #0077aa);
+    color: #fff;
+    border-radius: 8px;
+    min-width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-top: 48px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .section-num {
+    background: linear-gradient(135deg, #00c4ff, #0077aa);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(0,119,170,0.30);
+  }
+  .section-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0e4f6e;
+    letter-spacing: -0.02em;
+  }
+  .section-title small {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4aaace;
+    letter-spacing: 0;
+    margin-top: 2px;
+  }
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #00c4ff 0%, #e0f6ff 100%);
+    border-radius: 3px;
+    margin-bottom: 24px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 2px 16px rgba(0,120,180,0.08);
+    margin-bottom: 16px;
+    border: 1px solid #e2f0f9;
+  }
+  .card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0e4f6e;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p, .card li {
+    font-size: 14px;
+    color: #3a5a6e;
+    margin-bottom: 8px;
+  }
+  .card ul, .card ol {
+    padding-left: 20px;
+  }
+  .card li { margin-bottom: 6px; }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ── ROLE CARDS ── */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .role-card {
+    border-radius: 14px;
+    padding: 20px;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .role-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .role-card.superadmin { background: #fff8f0; border-color: #ff8c00; }
+  .role-card.superadmin::before { background: linear-gradient(90deg, #ff8c00, #ffb347); }
+  .role-card.admin { background: #f0f4ff; border-color: #4a6cf7; }
+  .role-card.admin::before { background: linear-gradient(90deg, #4a6cf7, #818cf8); }
+  .role-card.resp-etab { background: #f0faf5; border-color: #00a86b; }
+  .role-card.resp-etab::before { background: linear-gradient(90deg, #00a86b, #34d399); }
+  .role-card.resp-saisie { background: #fdf4ff; border-color: #a855f7; }
+  .role-card.resp-saisie::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
+  .role-card.visu { background: #f0f6fc; border-color: #64748b; }
+  .role-card.visu::before { background: linear-gradient(90deg, #64748b, #94a3b8); }
+  .role-card .role-name {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .role-card .role-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .role-card.superadmin .role-icon { background: #ff8c00; }
+  .role-card.admin .role-icon { background: #4a6cf7; }
+  .role-card.resp-etab .role-icon { background: #00a86b; }
+  .role-card.resp-saisie .role-icon { background: #a855f7; }
+  .role-card.visu .role-icon { background: #64748b; }
+  .role-card ul {
+    padding-left: 16px;
+    margin: 0;
+  }
+  .role-card li {
+    font-size: 12.5px;
+    color: #3a5a6e;
+    margin-bottom: 4px;
+  }
+
+  /* ── STEPS ── */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+  }
+  .steps li {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    background: linear-gradient(135deg, #00c4ff, #0077aa);
+    color: #fff;
+    min-width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 2px 8px rgba(0,119,170,0.30);
+  }
+  .steps li .step-content {
+    font-size: 14px;
+    color: #3a5a6e;
+    padding-top: 4px;
+  }
+  .steps li .step-content strong {
+    color: #0e4f6e;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ── ALERTS ── */
+  .alert {
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .alert .icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .alert-info { background: #e8f6ff; border-left: 4px solid #00aeef; color: #0e4f6e; }
+  .alert-warn { background: #fff8e1; border-left: 4px solid #f59e0b; color: #7c5000; }
+  .alert-success { background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; }
+  .alert-danger { background: #fef2f2; border-left: 4px solid #ef4444; color: #7f1d1d; }
+
+  /* ── PERMISSION TABLE ── */
+  .perm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,120,180,0.08);
+  }
+  .perm-table thead tr {
+    background: linear-gradient(135deg, #00c4ff, #0077aa);
+    color: #fff;
+  }
+  .perm-table th {
+    padding: 12px 14px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .perm-table th:first-child { text-align: left; }
+  .perm-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2f0f9;
+    text-align: center;
+    font-size: 13px;
+    color: #3a5a6e;
+  }
+  .perm-table td:first-child { text-align: left; font-weight: 600; color: #0e4f6e; }
+  .perm-table tbody tr:last-child td { border-bottom: none; }
+  .perm-table tbody tr:nth-child(even) { background: #f8fcff; }
+  .perm-table tbody tr:hover { background: #e8f6ff; }
+  .ok { color: #10b981; font-size: 17px; }
+  .no { color: #e5e7eb; font-size: 17px; }
+  .ro { color: #f59e0b; font-size: 13px; font-weight: 700; }
+
+  /* ── FEATURE HIGHLIGHT ── */
+  .feature {
+    display: flex;
+    gap: 16px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,120,180,0.07);
+    margin-bottom: 14px;
+    border: 1px solid #e2f0f9;
+    align-items: flex-start;
+  }
+  .feature .feat-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: #e8f6ff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .feature .feat-body h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0e4f6e;
+    margin-bottom: 6px;
+  }
+  .feature .feat-body p {
+    font-size: 13.5px;
+    color: #4a6a7e;
+  }
+
+  /* ── VALUES TABLE ── */
+  .val-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,120,180,0.08);
+  }
+  .val-table thead tr { background: #0e4f6e; color: #fff; }
+  .val-table th { padding: 12px 16px; font-weight: 700; text-align: left; }
+  .val-table td { padding: 10px 16px; border-bottom: 1px solid #e2f0f9; color: #3a5a6e; }
+  .val-table tbody tr:last-child td { border-bottom: none; }
+  .val-table tbody tr:nth-child(even) { background: #f8fcff; }
+  .val-range { font-weight: 700; color: #0077aa; }
+
+  /* ── INLINE TAGS ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .tag-blue { background: #dbeeff; color: #0054a3; }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-orange { background: #fff3cd; color: #7c5000; }
+  .tag-red { background: #fee2e2; color: #7f1d1d; }
+  .tag-purple { background: #ede9fe; color: #5b21b6; }
+  .tag-gray { background: #f1f5f9; color: #475569; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: #0e4f6e;
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 32px;
+    font-size: 13px;
+  }
+  .footer strong { color: #fff; }
+  .footer a { color: #4aaace; text-decoration: none; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .header { background: #0077aa !important; -webkit-print-color-adjust: exact; }
+    .section-num, .toc a .num { background: #0077aa !important; -webkit-print-color-adjust: exact; }
+    .card, .feature, .role-card { box-shadow: none; border: 1px solid #ddd; }
+    .perm-table thead tr { background: #0077aa !important; -webkit-print-color-adjust: exact; }
+    a { color: inherit; text-decoration: none; }
+    .toc-wrap { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <span>CIFEC</span>
+  </div>
+  <h1>Carnet Sanitaire Numérique</h1>
+  <p>Guide d'utilisation complet — Application de suivi des piscines</p>
+  <div class="badge">Version 2.0 &nbsp;·&nbsp; Mai 2026 &nbsp;·&nbsp; Arrêté du 26 mai 2021</div>
+</div>
+
+<!-- SOMMAIRE -->
+<div class="toc-wrap">
+  <div class="toc">
+    <h2>Table des matières</h2>
+    <div class="toc-grid">
+      <a href="#s1"><span class="num">1</span> Connexion</a>
+      <a href="#s2"><span class="num">2</span> Rôles &amp; accès</a>
+      <a href="#s3"><span class="num">3</span> Navigation</a>
+      <a href="#s4"><span class="num">4</span> Tableau de bord</a>
+      <a href="#s5"><span class="num">5</span> Relevés de qualité</a>
+      <a href="#s6"><span class="num">6</span> Fréquentation</a>
+      <a href="#s7"><span class="num">7</span> Interventions</a>
+      <a href="#s8"><span class="num">8</span> Bassins</a>
+      <a href="#s9"><span class="num">9</span> Contacts</a>
+      <a href="#s10"><span class="num">10</span> Statistiques</a>
+      <a href="#s11"><span class="num">11</span> Historique</a>
+      <a href="#s12"><span class="num">12</span> Utilisateurs</a>
+      <a href="#s13"><span class="num">13</span> Tableau des permissions</a>
+      <a href="#s14"><span class="num">14</span> Valeurs réglementaires</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ──────────────────────────────────────── 1. CONNEXION -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Connexion<small>Accès sécurisé à l'application</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>🔐 Page de connexion</h3>
+      <p>L'accès à l'application se fait via une page de connexion sécurisée affichant le logo CIFEC. Saisissez vos identifiants fournis par votre administrateur.</p>
+    </div>
+
+    <ol class="steps">
+      <li><div class="step-content"><strong>Accédez à l'URL de l'application</strong>Ouvrez votre navigateur et saisissez l'adresse communiquée par CIFEC.</div></li>
+      <li><div class="step-content"><strong>Saisissez votre email</strong>Utilisez l'adresse email associée à votre compte.</div></li>
+      <li><div class="step-content"><strong>Saisissez votre mot de passe</strong>Le mot de passe vous a été communiqué par votre administrateur lors de la création de votre compte.</div></li>
+      <li><div class="step-content"><strong>Cliquez sur "Se connecter"</strong>Vous êtes redirigé vers le tableau de bord selon votre rôle.</div></li>
+    </ol>
+
+    <div class="alert alert-warn">
+      <span class="icon">⚠️</span>
+      <div>En cas d'oubli de mot de passe, contactez votre administrateur ou CIFEC. Il n'existe pas de réinitialisation automatique par email.</div>
+    </div>
+    <div class="alert alert-info">
+      <span class="icon">ℹ️</span>
+      <div>Votre session reste active pendant 24 heures. Déconnectez-vous manuellement si vous utilisez un poste partagé (bouton en bas de la barre latérale).</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 2. RÔLES -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Rôles &amp; niveaux d'accès<small>Chaque utilisateur dispose de droits adaptés à sa fonction</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="role-grid">
+      <div class="role-card superadmin">
+        <div class="role-name"><div class="role-icon">👑</div> Super Administrateur</div>
+        <ul>
+          <li>Accès total à toutes les fonctions</li>
+          <li>Gestion de tous les établissements</li>
+          <li>Création et suppression de comptes</li>
+          <li>Configuration système globale</li>
+        </ul>
+      </div>
+      <div class="role-card admin">
+        <div class="role-name"><div class="role-icon">🛡️</div> Administrateur</div>
+        <ul>
+          <li>Gestion complète de l'établissement</li>
+          <li>Création/modification/suppression</li>
+          <li>Gestion des utilisateurs du site</li>
+          <li>Accès à toutes les statistiques</li>
+        </ul>
+      </div>
+      <div class="role-card resp-etab">
+        <div class="role-name"><div class="role-icon">🏢</div> Responsable d'Établissement</div>
+        <ul>
+          <li>Gestion opérationnelle complète</li>
+          <li>Création/modification de tous les relevés</li>
+          <li>Accès aux statistiques &amp; historique</li>
+          <li>Configuration bassins et contacts</li>
+        </ul>
+      </div>
+      <div class="role-card resp-saisie">
+        <div class="role-name"><div class="role-icon">✏️</div> Responsable de Saisie</div>
+        <ul>
+          <li>Saisie des relevés et fréquentations</li>
+          <li>Création et suivi des interventions</li>
+          <li>Lecture seule sur bassins et contacts</li>
+          <li>Pas d'accès à l'historique ni aux stats</li>
+        </ul>
+      </div>
+      <div class="role-card visu">
+        <div class="role-name"><div class="role-icon">👁️</div> Auditeur</div>
+        <ul>
+          <li>Lecture seule sur toutes les sections</li>
+          <li>Consultation des relevés et statistiques</li>
+          <li>Aucune modification possible</li>
+          <li>Accès limité à la navigation essentielle</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert alert-success">
+      <span class="icon">✅</span>
+      <div>L'interface s'adapte automatiquement à votre rôle : les boutons d'action (Nouveau, Modifier, Supprimer) n'apparaissent que si vous avez les droits correspondants. Les auditeurs voient une interface en <strong>lecture seule</strong> partout.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 3. NAVIGATION -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Navigation<small>La barre latérale s'adapte à votre rôle</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>📱 Barre de navigation latérale</h3>
+      <p>La barre latérale gauche affiche uniquement les sections auxquelles votre rôle donne accès. Les onglets inutilisables sont automatiquement masqués.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>🏠 Tableau de bord</h3>
+        <p>Accessible à tous les rôles. Vue synthétique de l'activité du jour et indicateurs clés.</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>💧 Relevés</h3>
+        <p>Consultation et saisie des analyses de l'eau (pH, chlore, température, etc.).</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>👥 Fréquentation</h3>
+        <p>Enregistrement du nombre de baigneurs par créneau et par bassin.</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>🔧 Interventions</h3>
+        <p>Suivi des incidents, travaux et actions correctives sur les équipements.</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>🏊 Bassins</h3>
+        <p>Configuration des bassins (nom, volume, type). Lecture seule pour Responsable de Saisie et Auditeur.</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>📞 Contacts</h3>
+        <p>Répertoire des contacts d'urgence et techniques. Lecture seule pour Responsable de Saisie et Auditeur.</p>
+        <div style="margin-top:8px"><span class="tag tag-green">Tous les rôles</span></div>
+      </div>
+      <div class="card">
+        <h3>📊 Statistiques</h3>
+        <p>Graphiques d'évolution avec sélection de plage temporelle et navigation par zoom.</p>
+        <div style="margin-top:8px"><span class="tag tag-blue">Admin + Responsable d'Établissement + Visu</span></div>
+      </div>
+      <div class="card">
+        <h3>📅 Historique</h3>
+        <p>Journal complet de toutes les saisies sur la période de votre choix.</p>
+        <div style="margin-top:8px"><span class="tag tag-orange">Admin + Responsable d'Établissement uniquement</span></div>
+      </div>
+      <div class="card">
+        <h3>🏛️ Établissement</h3>
+        <p>Paramètres généraux de l'établissement (nom, adresse, informations légales).</p>
+        <div style="margin-top:8px"><span class="tag tag-orange">Admin + Responsable d'Établissement uniquement</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 4. TABLEAU DE BORD -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Tableau de bord<small>Vue synthétique en temps réel</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="feature">
+      <div class="feat-icon">📈</div>
+      <div class="feat-body">
+        <h4>Indicateurs du jour</h4>
+        <p>Quatre cartes synthétiques affichent : le nombre de relevés du jour, le nombre de baigneurs aujourd'hui, le nombre d'interventions du mois en cours et la dernière valeur de pH mesurée.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">🔴</div>
+      <div class="feat-body">
+        <h4>Alertes de conformité</h4>
+        <p>Les relevés hors normes apparaissent en rouge avec un indicateur d'alerte. Vous êtes immédiatement informé des valeurs non conformes à la réglementation (pH hors [6.9–7.7], chlore hors [0.4–1.4 mg/L]).</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">📊</div>
+      <div class="feat-body">
+        <h4>Graphique avec sélection de plage temporelle</h4>
+        <p>Le graphique d'évolution du pH et du chlore propose trois modes d'affichage, sélectionnables directement par des boutons au-dessus du graphique :</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" style="border-left: 4px solid #00aeef;">
+        <h3>📅 Jour</h3>
+        <p>Affiche chaque relevé du jour actuel avec l'heure de mesure en abscisse. Idéal pour suivre l'évolution intra-journalière.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <h3>📅 Semaine</h3>
+        <p>Affiche les 7 derniers jours disponibles avec la moyenne journalière du pH et du chlore. Vue par défaut à l'ouverture.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <h3>📅 Mois</h3>
+        <p>Affiche les 30 derniers jours disponibles avec la moyenne journalière. Permet d'identifier les tendances mensuelles.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="icon">💡</span>
+      <div>Les boutons <strong>Jour / Semaine / Mois</strong> sont affichés au-dessus du graphique. Un simple clic change instantanément la plage affichée, sans rechargement de page.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">🚨</div>
+      <div class="feat-body">
+        <h4>Dernières interventions</h4>
+        <p>Les 5 interventions les plus récentes sont listées avec leur statut (en cours, résolu, clôturé) et la date de création. Un accès rapide vers la page Interventions est disponible.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 5. RELEVÉS -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Relevés de qualité d'eau<small>Saisie et consultation des analyses</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>💧 Qu'est-ce qu'un relevé ?</h3>
+      <p>Un relevé correspond à une mesure de la qualité de l'eau effectuée à un instant donné sur un bassin. Il enregistre :</p>
+      <ul>
+        <li><strong>Date et heure</strong> de la mesure</li>
+        <li><strong>Bassin concerné</strong></li>
+        <li><strong>pH</strong> (acidité de l'eau)</li>
+        <li><strong>Chlore libre</strong> et chlore total (mg/L)</li>
+        <li><strong>Température de l'eau</strong> et de l'air (°C)</li>
+        <li><strong>TAC</strong> (Titre Alcalimétrique Complet)</li>
+        <li><strong>Turbidité</strong> (NTU)</li>
+        <li><strong>Remarques</strong> libres</li>
+      </ul>
+    </div>
+
+    <h3 style="font-size:16px;font-weight:700;color:#0e4f6e;margin:20px 0 12px;">➕ Saisir un nouveau relevé</h3>
+    <div class="alert alert-info">
+      <span class="icon">ℹ️</span>
+      <div>Bouton "Nouveau relevé" visible uniquement pour les rôles <span class="tag tag-blue">Admin</span> <span class="tag tag-orange">Responsable d'Établissement</span> <span class="tag tag-purple">Responsable de Saisie</span></div>
+    </div>
+    <ol class="steps">
+      <li><div class="step-content"><strong>Cliquez sur "Nouveau relevé"</strong>Le formulaire de saisie s'affiche en haut de page.</div></li>
+      <li><div class="step-content"><strong>Sélectionnez le bassin</strong>Choisissez le bassin concerné dans la liste déroulante.</div></li>
+      <li><div class="step-content"><strong>Renseignez la date et l'heure</strong>La date et l'heure actuelles sont pré-remplies automatiquement.</div></li>
+      <li><div class="step-content"><strong>Saisissez les valeurs mesurées</strong>pH, chlore libre, chlore total, température eau, température air, TAC, turbidité.</div></li>
+      <li><div class="step-content"><strong>Ajoutez des remarques si nécessaire</strong>Champ libre pour toute observation complémentaire.</div></li>
+      <li><div class="step-content"><strong>Enregistrez</strong>Cliquez sur "Enregistrer". Le relevé apparaît instantanément dans la liste.</div></li>
+    </ol>
+
+    <div class="card">
+      <h3>🔴 Indicateurs de conformité</h3>
+      <p>Chaque relevé est automatiquement coloré selon sa conformité réglementaire :</p>
+      <ul>
+        <li><strong style="color:#10b981;">● Vert</strong> : valeurs conformes à la réglementation</li>
+        <li><strong style="color:#ef4444;">● Rouge</strong> : au moins une valeur hors normes (pH ou chlore)</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="icon">⚠️</span>
+      <div>La suppression d'un relevé est une action irréversible. Elle nécessite des droits spéciaux (<span class="tag tag-blue">Admin</span> <span class="tag tag-orange">Responsable d'Établissement</span> ou <span class="tag tag-gray">Super Admin</span>). Le resp. de saisie ne peut <strong>pas</strong> supprimer un relevé.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 6. FRÉQUENTATION -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title">Fréquentation<small>Suivi du nombre de baigneurs</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>👥 Enregistrement de la fréquentation</h3>
+      <p>Cette section permet de saisir le nombre de baigneurs par créneau horaire et par bassin. Ces données alimentent les indicateurs du tableau de bord et les statistiques de fréquentation.</p>
+    </div>
+
+    <ol class="steps">
+      <li><div class="step-content"><strong>Cliquez sur "Nouveau relevé de fréquentation"</strong>Le formulaire s'affiche. (Bouton visible pour Admin, Responsable d'Établissement, Responsable de Saisie uniquement.)</div></li>
+      <li><div class="step-content"><strong>Sélectionnez la date</strong>La date du jour est pré-remplie.</div></li>
+      <li><div class="step-content"><strong>Choisissez le bassin ou la zone</strong>Sélectionnez le bassin concerné.</div></li>
+      <li><div class="step-content"><strong>Saisissez le nombre de baigneurs</strong>Renseignez le total de baigneurs pour ce créneau.</div></li>
+      <li><div class="step-content"><strong>Enregistrez</strong>Le relevé est ajouté. Le cumul journalier est mis à jour sur le tableau de bord.</div></li>
+    </ol>
+
+    <div class="alert alert-info">
+      <span class="icon">💡</span>
+      <div>Le nombre de baigneurs du jour affiché sur le tableau de bord est la somme de tous les relevés de fréquentation de la journée en cours.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 7. INTERVENTIONS -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title">Interventions<small>Gestion des incidents et actions correctives</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>🔧 Qu'est-ce qu'une intervention ?</h3>
+      <p>Une intervention est toute action corrective, incident, panne ou travaux effectués sur les équipements de la piscine. Elle comprend :</p>
+      <ul>
+        <li>Un titre descriptif</li>
+        <li>Une description détaillée</li>
+        <li>La date de l'intervention</li>
+        <li>Le statut : <strong>En cours</strong>, <strong>Résolu</strong> ou <strong>Clôturé</strong></li>
+      </ul>
+    </div>
+
+    <h3 style="font-size:16px;font-weight:700;color:#0e4f6e;margin:20px 0 12px;">🔄 Statuts des interventions</h3>
+    <div class="card-grid">
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <h3>⏳ En cours</h3>
+        <p>L'intervention est active. Des actions sont en cours. Apparaît en orange sur le tableau de bord.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <h3>✅ Résolu</h3>
+        <p>L'incident a été traité. Le problème est résolu mais la fiche reste consultable.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #6b7280;">
+        <h3>📁 Clôturé</h3>
+        <p>L'intervention est définitivement archivée. Aucune action supplémentaire requise.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="icon">💡</span>
+      <div>Les utilisateurs avec droits de modification peuvent changer le statut directement depuis la liste via un menu déroulant. Les <strong>auditeurs</strong> voient le statut affiché en texte, sans possibilité de modification.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 8. BASSINS -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title">Bassins<small>Configuration des bassins de baignade</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>🏊 Gestion des bassins</h3>
+      <p>Cette section permet de configurer les bassins de votre établissement. Chaque bassin est caractérisé par son nom, son type, son volume et ses dimensions.</p>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="icon">🔒</span>
+      <div>La configuration des bassins est réservée aux rôles <span class="tag tag-gray">Super Admin</span> <span class="tag tag-blue">Admin</span> <span class="tag tag-orange">Responsable d'Établissement</span>. Les <strong>responsables de saisie</strong> et les <strong>auditeurs</strong> ont un accès en <strong>lecture seule</strong> : ils peuvent consulter la liste des bassins mais ne peuvent pas les créer, modifier ou supprimer.</div>
+    </div>
+
+    <ol class="steps">
+      <li><div class="step-content"><strong>Accédez à la section "Bassins"</strong>Dans la barre de navigation latérale.</div></li>
+      <li><div class="step-content"><strong>Cliquez sur "Nouveau bassin"</strong>(Visible uniquement pour Admin et Responsable d'Établissement)</div></li>
+      <li><div class="step-content"><strong>Renseignez les informations</strong>Nom du bassin, type (Sportif, Ludique, Pataugeoire…), volume en m³, longueur et largeur.</div></li>
+      <li><div class="step-content"><strong>Enregistrez</strong>Le bassin est disponible dans tous les formulaires de relevés et de fréquentation.</div></li>
+    </ol>
+  </div>
+
+  <!-- ──────────────────────────────────────── 9. CONTACTS -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div class="section-title">Contacts<small>Répertoire des contacts utiles</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>📞 Répertoire de contacts</h3>
+      <p>Centralisez les contacts importants : service de secours, fournisseurs de produits chimiques, mainteneurs d'équipements, ARS, etc. Ces contacts sont accessibles à tous les utilisateurs en lecture.</p>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="icon">🔒</span>
+      <div>Comme pour les Bassins, la gestion des contacts (ajout, modification, suppression) est réservée aux rôles <span class="tag tag-gray">Super Admin</span> <span class="tag tag-blue">Admin</span> <span class="tag tag-orange">Responsable d'Établissement</span>. Les autres rôles ont un accès en <strong>lecture seule</strong>.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 10. STATISTIQUES -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div class="section-title">Statistiques<small>Analyse graphique avec navigation temporelle avancée</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="card">
+      <h3>📊 Tableaux de bord statistiques</h3>
+      <p>La page Statistiques offre une visualisation graphique complète de l'évolution de la qualité de l'eau, de la fréquentation et des interventions sur la période de votre choix.</p>
+    </div>
+
+    <h3 style="font-size:16px;font-weight:700;color:#0e4f6e;margin:20px 0 12px;">⏱️ Sélection de la plage temporelle</h3>
+    <p style="font-size:14px;color:#3a5a6e;margin-bottom:12px;">Quatre modes sont disponibles via des boutons en haut des graphiques :</p>
+
+    <div class="card-grid">
+      <div class="card" style="border-left: 4px solid #6366f1;">
+        <h3>📅 Jour</h3>
+        <p>Affiche tous les relevés d'une journée donnée avec l'heure de mesure. Permet de suivre l'évolution heure par heure.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #00aeef;">
+        <h3>📅 Semaine</h3>
+        <p>Affiche les 7 jours de la semaine sélectionnée (Lundi → Dimanche) avec la moyenne journalière.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <h3>📅 Mois</h3>
+        <p>Affiche chaque jour du mois sélectionné avec la moyenne journalière. Idéal pour identifier les tendances.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <h3>📅 Année</h3>
+        <p>Affiche les 12 mois de l'année sélectionnée avec la moyenne mensuelle. Vue d'ensemble saisonnière.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">🔍</div>
+      <div class="feat-body">
+        <h4>Navigation par zoom (Drill-down)</h4>
+        <p>Cliquez directement sur une barre ou un point du graphique pour zoomer dans cette période. Un message indique la direction du zoom possible :</p>
+        <ul style="margin-top:8px;padding-left:20px;font-size:13.5px;color:#4a6a7e;">
+          <li><strong>Vue Année</strong> → clic sur un mois → Vue Mois pour ce mois</li>
+          <li><strong>Vue Mois</strong> → clic sur un jour → Vue Jour pour ce jour</li>
+          <li><strong>Vue Semaine</strong> → clic sur un jour → Vue Jour pour ce jour</li>
+          <li><strong>Vue Jour</strong> → zoom maximum, pas de drill-down supplémentaire</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">⬅️</div>
+      <div class="feat-body">
+        <h4>Bouton "← Retour"</h4>
+        <p>Après avoir zoomé, un bouton "← Retour" apparaît pour remonter d'un niveau (Jour → Mois → Année). La navigation est fluide et sans rechargement de page.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feat-icon">◀▶</div>
+      <div class="feat-body">
+        <h4>Navigation chronologique</h4>
+        <p>Des flèches permettent de passer à la période précédente ou suivante (jour précédent/suivant, semaine précédente/suivante, mois précédent/suivant, année précédente/suivante).</p>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="icon">💡</span>
+      <div>Le curseur devient une main (👆) lorsque le zoom est possible sur un graphique. Un libellé "↓ Cliquez pour zoomer" apparaît sous les graphiques concernés.</div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Graphiques disponibles</h3>
+      <ul>
+        <li><strong>Évolution du pH</strong> — courbe avec seuils réglementaires</li>
+        <li><strong>Évolution du chlore libre</strong> — courbe avec zones de conformité</li>
+        <li><strong>Fréquentation</strong> — histogramme du nombre de baigneurs</li>
+        <li><strong>Interventions</strong> — nombre d'interventions par période</li>
+        <li><strong>Taux de conformité</strong> — pourcentage de relevés conformes</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 11. HISTORIQUE -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div class="section-title">Historique<small>Journal complet de toutes les saisies</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="alert alert-warn">
+      <span class="icon">🔒</span>
+      <div>L'historique est accessible uniquement aux rôles <span class="tag tag-gray">Super Admin</span> <span class="tag tag-blue">Admin</span> et <span class="tag tag-orange">Responsable d'Établissement</span>. Il n'est pas visible pour les Responsables de Saisie ni les Auditeurs.</div>
+    </div>
+
+    <div class="card">
+      <h3>📅 Consultation de l'historique</h3>
+      <p>L'historique présente la liste complète de tous les relevés de qualité enregistrés, avec filtrage par période. Vous pouvez filtrer par :</p>
+      <ul>
+        <li>Plage de dates (date de début / date de fin)</li>
+        <li>Bassin spécifique</li>
+        <li>Statut de conformité (conformes uniquement, non-conformes uniquement)</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-success">
+      <span class="icon">📋</span>
+      <div>L'historique constitue le carnet sanitaire numérique officiel. Il répond aux exigences de l'Arrêté du 26 mai 2021 (NOR:SSAP2004757A) en matière de traçabilité des analyses de l'eau.</div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 12. UTILISATEURS -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <div class="section-title">Gestion des utilisateurs<small>Création et administration des comptes</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="alert alert-warn">
+      <span class="icon">🔒</span>
+      <div>La gestion des utilisateurs est réservée aux <span class="tag tag-gray">Super Admin</span> et <span class="tag tag-blue">Admin</span>.</div>
+    </div>
+
+    <ol class="steps">
+      <li><div class="step-content"><strong>Accédez à "Établissement" puis "Utilisateurs"</strong>Depuis la barre de navigation.</div></li>
+      <li><div class="step-content"><strong>Cliquez sur "Nouvel utilisateur"</strong>Le formulaire de création s'affiche.</div></li>
+      <li><div class="step-content"><strong>Renseignez le nom, l'email et le rôle</strong>Choisissez le rôle approprié parmi les cinq disponibles.</div></li>
+      <li><div class="step-content"><strong>Définissez un mot de passe temporaire</strong>L'utilisateur devra le conserver ou en demander un nouveau à l'administrateur.</div></li>
+      <li><div class="step-content"><strong>Enregistrez</strong>L'utilisateur peut immédiatement se connecter avec ses identifiants.</div></li>
+    </ol>
+
+    <div class="card">
+      <h3>✏️ Modifier un utilisateur</h3>
+      <p>Vous pouvez modifier le nom, l'email, le rôle ou réinitialiser le mot de passe d'un utilisateur existant depuis la liste des utilisateurs.</p>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 13. PERMISSIONS -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <div class="section-title">Tableau des permissions<small>Récapitulatif des droits par rôle</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <table class="perm-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;min-width:180px;">Fonctionnalité</th>
+          <th>👑 Super<br>Admin</th>
+          <th>🛡️ Admin</th>
+          <th>🏢 Resp.<br>Étab.</th>
+          <th>✏️ Resp.<br>de Saisie</th>
+          <th>👁️ Visu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">TABLEAU DE BORD</td></tr>
+        <tr>
+          <td>Voir le tableau de bord</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Changer plage graphique (J/S/M)</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">RELEVÉS</td></tr>
+        <tr>
+          <td>Consulter les relevés</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Créer un relevé</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Modifier un relevé</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Supprimer un relevé</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">FRÉQUENTATION</td></tr>
+        <tr>
+          <td>Consulter la fréquentation</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Créer / modifier</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Supprimer</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">INTERVENTIONS</td></tr>
+        <tr>
+          <td>Consulter</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Créer / modifier le statut</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Supprimer</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">BASSINS &amp; CONTACTS</td></tr>
+        <tr>
+          <td>Consulter</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ro">Lecture</span></td><td><span class="ro">Lecture</span></td>
+        </tr>
+        <tr>
+          <td>Créer / modifier</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Supprimer</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">STATISTIQUES &amp; HISTORIQUE</td></tr>
+        <tr>
+          <td>Statistiques</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Drill-down &amp; plages temporelles</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="ok">✔</span></td>
+        </tr>
+        <tr>
+          <td>Historique</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+
+        <tr><td colspan="6" style="background:#e8f6ff;color:#0077aa;font-weight:700;font-size:12px;letter-spacing:0.05em;text-align:left;padding:8px 14px;">ADMINISTRATION</td></tr>
+        <tr>
+          <td>Gérer les utilisateurs</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Paramètres établissement</td>
+          <td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+        <tr>
+          <td>Gestion multi-établissements</td>
+          <td><span class="ok">✔</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td><td><span class="no">✘</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:12px;font-size:12px;color:#666;display:flex;gap:20px;flex-wrap:wrap;">
+      <span><span class="ok">✔</span> Accès complet</span>
+      <span><span class="no">✘</span> Accès refusé</span>
+      <span><span class="ro">Lecture</span> Lecture seule uniquement</span>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────── 14. VALEURS RÉGLEMENTAIRES -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <div class="section-num">14</div>
+      <div class="section-title">Valeurs réglementaires<small>Normes de qualité de l'eau — Arrêté du 26 mai 2021</small></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="alert alert-success">
+      <span class="icon">📋</span>
+      <div>L'application vérifie automatiquement la conformité de chaque relevé par rapport à ces valeurs. Un relevé non conforme apparaît en rouge dans toutes les vues.</div>
+    </div>
+
+    <table class="val-table">
+      <thead>
+        <tr>
+          <th>Paramètre</th>
+          <th>Valeur / Plage réglementaire</th>
+          <th>Unité</th>
+          <th>Fréquence minimale de mesure</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>pH</strong></td>
+          <td><span class="val-range">6,9 — 7,7</span></td>
+          <td>—</td>
+          <td>Toutes les 4 heures (ouverture au public)</td>
+        </tr>
+        <tr>
+          <td><strong>Chlore libre</strong></td>
+          <td><span class="val-range">0,4 — 1,4</span></td>
+          <td>mg/L</td>
+          <td>Toutes les 4 heures</td>
+        </tr>
+        <tr>
+          <td><strong>Chlore combiné</strong></td>
+          <td><span class="val-range">≤ 0,6</span></td>
+          <td>mg/L</td>
+          <td>Quotidienne</td>
+        </tr>
+        <tr>
+          <td><strong>Chlore total</strong></td>
+          <td><span class="val-range">≤ 2,0</span></td>
+          <td>mg/L</td>
+          <td>Quotidienne</td>
+        </tr>
+        <tr>
+          <td><strong>Turbidité</strong></td>
+          <td><span class="val-range">≤ 0,5</span></td>
+          <td>NTU</td>
+          <td>Quotidienne</td>
+        </tr>
+        <tr>
+          <td><strong>TAC (Alcalinité)</strong></td>
+          <td><span class="val-range">≥ 0,5</span></td>
+          <td>mEq/L</td>
+          <td>Hebdomadaire</td>
+        </tr>
+        <tr>
+          <td><strong>Température eau</strong></td>
+          <td><span class="val-range">≤ 33</span></td>
+          <td>°C</td>
+          <td>Quotidienne</td>
+        </tr>
+        <tr>
+          <td><strong>Température air</strong></td>
+          <td>Variable selon type</td>
+          <td>°C</td>
+          <td>Quotidienne</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-danger" style="margin-top:16px;">
+      <span class="icon">🚨</span>
+      <div><strong>Obligation légale :</strong> Conformément à l'Arrêté du 26 mai 2021 (NOR:SSAP2004757A), tout exploitant de piscine ouverte au public est tenu de tenir un carnet sanitaire et d'effectuer les mesures aux fréquences minimales indiquées ci-dessus. Ce carnet numérique CIFEC permet de répondre à cette obligation.</div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>📌 Rappels importants</h3>
+      <ul>
+        <li>Les mesures doivent être effectuées <strong>avant l'ouverture au public</strong> et pendant les heures d'ouverture.</li>
+        <li>En cas de valeur hors norme, une action corrective doit être menée <strong>immédiatement</strong> et documentée via une intervention.</li>
+        <li>Le carnet sanitaire doit être conservé et mis à disposition des autorités de contrôle (ARS) sur demande.</li>
+        <li>Les données saisies dans cette application constituent le carnet sanitaire officiel au sens de la réglementation.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p><strong>Carnet Sanitaire Numérique CIFEC</strong> — Version 2.0</p>
+  <p style="margin-top:6px;">Arrêté du 26 mai 2021 (NOR:SSAP2004757A) · Guide révisé en mai 2026</p>
+  <p style="margin-top:8px;font-size:12px;">Pour toute assistance technique, contactez <a href="mailto:support@cifec.fr">support@cifec.fr</a></p>
+</div>
+
+</body>
+</html>

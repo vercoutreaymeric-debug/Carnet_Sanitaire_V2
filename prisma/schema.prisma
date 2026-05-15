@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Etablissement {
+  id                        Int      @id @default(1)
+  nom                       String
+  adresse                   String   @default("")
+  telephone                 String   @default("")
+  capaciteBaigneursCouvert  Int      @default(0)
+  capaciteVisiteursCouvert  Int      @default(0)
+  capaciteBaigneursPleinAir Int      @default(0)
+  capaciteVisiteursPleinAir Int      @default(0)
+  updatedAt                 DateTime @updatedAt
+}
+
+model Bassin {
+  id                   Int      @id @default(autoincrement())
+  nom                  String
+  type                 String   @default("couvert")
+  longueur             Float?
+  largeur              Float?
+  profMin              Float?
+  profMax              Float?
+  surfSuperieure       Float?
+  surfInferieure       Float?
+  volumeTotal          Float?
+  debitReglementaire   Float?
+  debitInstallation    Float?
+  traitementPrincipal  String?  // Chlore, Brome, PHMB, Sel/Électrolyse, UV, Minéralisation
+  typeStabilisant      String?  // Magnésium, Sel de mer, Sel minéral, Autre — si Minéralisation
+  typeMesure           String?  // analyseur (réglementaire) | ponctuelle (non réglementaire)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  releves              Releve[]
+}
+
+model Releve {
+  id             Int      @id @default(autoincrement())
+  date           String
+  bassinId       Int
+  bassin         Bassin   @relation(fields: [bassinId], references: [id], onDelete: Cascade)
+  bassinNom      String
+  heure          String
+  transparence   String   @default("Bonne")
+  tempEau        Float
+  tempAir        Float?
+  ph             Float
+  chloreLibre    Float
+  chloreCombine  Float?
+  chloreTotal    Float?
+  turbidite      Float?
+  redox          Float?   // potentiel d'oxydoréduction (mV) — obligatoire si analyseur
+  cyanurate      Float?   // stabilisant chlore (mg/L) — piscines plein air
+  tauxChlorure   Float?   // chlorure (mg/L) — piscines sel/électrolyse
+  th             Float?
+  tac            Float?
+  volumeReactif  Float?
+  debitRecyclage Float?
+  status         String
+  valide         Boolean  @default(false)
+  valideePar     String?  // nom du validateur
+  valideeAt      DateTime?
+  createdAt      DateTime @default(now())
+}
+
+model Frequentation {
+  id                Int      @id @default(autoincrement())
+  date              String
+  scolaire          Int      @default(0)
+  club              Int      @default(0)
+  publicCount       Int      @default(0)
+  total             Int      @default(0)
+  reportEau         Float?
+  releveEau         Float?
+  totalEau          Float?
+  litresParBaigneur Float?
+  createdAt         DateTime @default(now())
+}
+
+model Intervention {
+  id          Int      @id @default(autoincrement())
+  date        String
+  heure       String?
+  type        String
+  bassin      String
+  description String
+  agent       String?
+  status      String   @default("en cours")
+  createdAt   DateTime @default(now())
+}
+
+model Contact {
+  id          Int     @id @default(autoincrement())
+  categorie   String
+  nom         String
+  adresse     String?
+  responsable String?
+  bureau      String?
+  domicile    String?
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // SHA-256 hash
+  role      String   @default("responsable_saisie")
+  nom       String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Abonnement {
+  id               Int       @id @default(1)
+  plan             String    @default("Starter")   // Starter | Pro | Intégral | Sur-mesure
+  statut           String    @default("essai")      // actif | essai | suspendu | expiré
+  dateDebut        DateTime  @default(now())
+  dateExpiration   DateTime
+  maxBassins       Int       @default(5)
+  maxUtilisateurs  Int       @default(10)
+  notes            String    @default("")           // note interne CIFEC
+  updatedAt        DateTime  @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String   // CREATE | UPDATE | DELETE | RESTORE
+  module    String   // releve | intervention | bassin | frequentation | contact | backup
+  detail    String
+  createdAt DateTime @default(now())
+}

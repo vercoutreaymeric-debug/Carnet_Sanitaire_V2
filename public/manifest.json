@@ -1,0 +1,37 @@
+{
+  "name": "Carnet Sanitaire CIFEC",
+  "short_name": "Carnet Sanitaire",
+  "description": "Carnet sanitaire numérique conforme à l'arrêté du 26 mai 2021",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e4f6e",
+  "theme_color": "#00aeef",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/assets/logo-cifec.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logo-cifec.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau relevé",
+      "url": "/releves",
+      "description": "Saisir un relevé journalier"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/",
+      "description": "Tableau de bord"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Expand-Archive -Path \"C:\\\\Users\\\\DB\\\\Downloads\\\\Carnet sanitaire-handoff.zip\" -DestinationPath \"C:\\\\Users\\\\DB\\\\Downloads\\\\Carnet_sanitaire_handoff\" -Force)",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\DB\\\\Downloads\\\\Carnet_sanitaire_handoff\")",
+      "Bash(Select-Object FullName, Length)",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\DB\" -Recurse -Filter \"carnet_sanitaire.sql\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}
