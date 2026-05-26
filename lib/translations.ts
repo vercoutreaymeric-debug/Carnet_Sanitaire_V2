@@ -5,6 +5,7 @@ export const T = {
     dashboard:      { fr: 'Tableau de bord',      en: 'Dashboard' },
     releves:        { fr: 'Relevés journaliers',   en: 'Daily Records' },
     frequentation:  { fr: 'Fréquentation',         en: 'Attendance' },
+    traitements:    { fr: 'Traitements',            en: 'Treatments' },
     interventions:  { fr: 'Interventions',          en: 'Interventions' },
     bassins:        { fr: 'Dossier technique',      en: 'Technical Files' },
     etablissement:  { fr: 'Fiche établissement',    en: 'Establishment' },

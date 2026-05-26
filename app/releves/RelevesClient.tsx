@@ -74,6 +74,7 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
     : null
 
   const bassinActif = bassins.find(b => String(b.id) === form.bassinId)
+  const pointsBassin: string[] = (() => { try { return JSON.parse(bassinActif?.pointsPrelevement || '[]') } catch { return [] } })()
   const previewChloreActif = (form.chloreLibre && form.ph && form.tempEau)
     ? calcChloreActif(
         parseFloat(form.chloreLibre),
@@ -261,16 +262,15 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
               </select>
             </div>
             <Input label="Heure" value={form.heure} onChange={e => upd('heure', e.target.value)} type="time" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Point de prélèvement</label>
-              <select style={selectStyle} value={form.pointPrelevement} onChange={e => upd('pointPrelevement', e.target.value)}>
-                <option value="">— Principal —</option>
-                <option value="A">Point A</option>
-                <option value="B">Point B</option>
-                <option value="C">Point C</option>
-                <option value="D">Point D</option>
-              </select>
-            </div>
+            {pointsBassin.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Point de prélèvement</label>
+                <select style={selectStyle} value={form.pointPrelevement} onChange={e => upd('pointPrelevement', e.target.value)}>
+                  <option value="">— Non précisé —</option>
+                  {pointsBassin.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Transparence</label>
               <select style={selectStyle} value={form.transparence} onChange={e => upd('transparence', e.target.value)}>
@@ -323,26 +323,30 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
             </div>
           </div>
 
-          {(previewStatus || previewChloreActif !== null) && (
-            <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-              {previewStatus && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
-                  <Badge status={previewStatus} small />
-                </div>
-              )}
-              {previewChloreActif !== null && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Chlore libre actif :</span>
+          <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            {previewStatus ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
+                <Badge status={previewStatus} small />
+              </div>
+            ) : (
+              <span style={{ fontSize: 12, color: 'var(--text3)' }}>Renseignez pH + Chlore libre pour voir le statut</span>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 12, color: 'var(--text2)' }}>Chlore libre actif :</span>
+              {previewChloreActif !== null ? (
+                <>
                   <span style={{
                     fontFamily: 'DM Mono', fontWeight: 700, fontSize: 13,
                     color: previewChloreActif >= 0.4 ? 'var(--green)' : previewChloreActif >= 0.2 ? 'var(--orange)' : 'var(--red)',
                   }}>{previewChloreActif} mg/L</span>
-                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>(réglementaire ≥ 0,4)</span>
-                </div>
+                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>(min. ≥ 0,4)</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>— renseignez pH, Cl libre et T° eau</span>
               )}
             </div>
-          )}
+          </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
             <Btn icon="save" onClick={handleSave} disabled={saving || !form.ph || !form.chloreLibre}>

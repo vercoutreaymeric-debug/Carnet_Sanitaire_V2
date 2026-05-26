@@ -18,6 +18,7 @@ const emptyForm = {
   longueur: '', largeur: '', profMin: '', profMax: '',
   surfSuperieure: '', surfInferieure: '', volumeTotal: '', debitReglementaire: '', debitInstallation: '',
   traitementPrincipal: '', typeStabilisant: '', typeMesure: '',
+  pointsPrelevement: '[]',
 }
 
 type BassinForm = typeof emptyForm
@@ -157,6 +158,7 @@ export default function BassinsClient({ initialData }: Props) {
     nom: b.nom, type: b.type,
     typeReglementaire: b.typeReglementaire ?? '',
     mineralisationEau: b.mineralisationEau ?? 'normale',
+    pointsPrelevement: b.pointsPrelevement ?? '[]',
     longueur: String(b.longueur ?? ''), largeur: String(b.largeur ?? ''),
     profMin: String(b.profMin ?? ''), profMax: String(b.profMax ?? ''),
     surfSuperieure: String(b.surfSuperieure ?? ''), surfInferieure: String(b.surfInferieure ?? ''),
@@ -211,7 +213,22 @@ export default function BassinsClient({ initialData }: Props) {
     padding: '8px 12px', color: 'var(--text)', fontFamily: 'DM Sans', fontSize: 14, outline: 'none', width: '100%',
   }
 
-  const FormGrid = ({ form, upd }: { form: BassinForm; upd: (k: string, v: string) => void }) => (
+  const FormGrid = ({ form, upd }: { form: BassinForm; upd: (k: string, v: string) => void }) => {
+    const points: string[] = (() => { try { return JSON.parse(form.pointsPrelevement || '[]') } catch { return [] } })()
+    const [newPoint, setNewPoint] = useState('')
+
+    const addPoint = () => {
+      const trimmed = newPoint.trim()
+      if (!trimmed || points.includes(trimmed)) return
+      upd('pointsPrelevement', JSON.stringify([...points, trimmed]))
+      setNewPoint('')
+    }
+
+    const removePoint = (i: number) => {
+      upd('pointsPrelevement', JSON.stringify(points.filter((_, idx) => idx !== i)))
+    }
+
+    return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Dimensions */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12 }}>
@@ -294,8 +311,42 @@ export default function BassinsClient({ initialData }: Props) {
 
         </div>
       </div>
+
+      {/* Points de prélèvement */}
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Points de prélèvement
+        </p>
+        <p style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 10 }}>
+          Nommez librement les points de mesure de ce bassin (ex : Fond, Surface, Entrée filtration…)
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+          {points.map((p, i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--accent)18', color: 'var(--accent)', border: '1px solid var(--accent)33', borderRadius: 20, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>
+              {p}
+              <button onClick={() => removePoint(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 0, lineHeight: 1, fontSize: 15 }}>×</button>
+            </span>
+          ))}
+          {points.length === 0 && <span style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>Aucun point défini</span>}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            type="text"
+            value={newPoint}
+            onChange={e => setNewPoint(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addPoint()}
+            placeholder="Nom du point (ex: Fond)"
+            style={{ ...selectStyle, flex: 1, maxWidth: 240 }}
+          />
+          <button onClick={addPoint} disabled={!newPoint.trim()} style={{ background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontFamily: 'DM Sans', fontWeight: 600, fontSize: 13, cursor: 'pointer', opacity: newPoint.trim() ? 1 : 0.4 }}>
+            + Ajouter
+          </button>
+        </div>
+      </div>
+
     </div>
   )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -414,6 +465,16 @@ export default function BassinsClient({ initialData }: Props) {
                 <Metric label="Débit régl." value={b.debitReglementaire} unit={b.debitReglementaire ? 'm³/h' : undefined} />
                 <Metric label="Débit install." value={b.debitInstallation} unit={b.debitInstallation ? 'm³/h' : undefined} />
               </div>
+              {(() => { try { return JSON.parse(b.pointsPrelevement || '[]') as string[] } catch { return [] } })().length > 0 && (
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text3)', display: 'block', marginBottom: 8 }}>Points de prélèvement :</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {((() => { try { return JSON.parse(b.pointsPrelevement || '[]') as string[] } catch { return [] } })()).map((p, i) => (
+                      <span key={i} style={{ fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: 'var(--accent)18', color: 'var(--accent)', border: '1px solid var(--accent)33' }}>{p}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {(b.traitementPrincipal || b.typeMesure) && (
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {b.traitementPrincipal && (

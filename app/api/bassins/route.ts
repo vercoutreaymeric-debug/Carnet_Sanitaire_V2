@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
         typeMesure: body.typeMesure || null,
         typeReglementaire: body.typeReglementaire || null,
         mineralisationEau: body.mineralisationEau || null,
+        pointsPrelevement: body.pointsPrelevement ? JSON.stringify(body.pointsPrelevement) : null,
       },
     })
     return NextResponse.json(bassin, { status: 201 })

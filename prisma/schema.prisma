@@ -37,6 +37,7 @@ model Bassin {
   traitementPrincipal  String?      // Chlore, Brome, PHMB, Sel/Électrolyse, UV, Minéralisation
   typeStabilisant      String?      // Magnésium, Sel de mer, Sel minéral, Autre — si Minéralisation
   typeMesure           String?      // analyseur (réglementaire) | ponctuelle (non réglementaire)
+  pointsPrelevement    String?      // JSON array de noms libres ex: ["Fond", "Surface", "Entrée"]
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
   releves              Releve[]

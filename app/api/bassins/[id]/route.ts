@@ -22,6 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       typeMesure: body.typeMesure || null,
       typeReglementaire: body.typeReglementaire || null,
       mineralisationEau: body.mineralisationEau || null,
+      pointsPrelevement: body.pointsPrelevement ? JSON.stringify(body.pointsPrelevement) : null,
     },
   })
   return NextResponse.json(bassin)

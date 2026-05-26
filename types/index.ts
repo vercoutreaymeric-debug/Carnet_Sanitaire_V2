@@ -34,6 +34,7 @@ export interface Bassin {
   type: string
   typeReglementaire: string | null
   mineralisationEau: string | null
+  pointsPrelevement: string | null
   longueur: number | null
   largeur: number | null
   profMin: number | null
