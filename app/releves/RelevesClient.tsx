@@ -12,6 +12,7 @@ import QRScanner from '@/components/QRScanner'
 import { CanCreate, CanDeleteReleve, CanValider } from '@/components/RoleGate'
 import { useAuth } from '@/contexts/AuthContext'
 import { todayISO, computeStatus } from '@/lib/utils'
+import { calcChloreActif } from '@/lib/chloreActif'
 import type { Releve, Bassin } from '@/types'
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
 
 const emptyForm = {
   bassinId: '', bassinNom: '', heure: '08:30', transparence: 'Bonne',
+  pointPrelevement: '',
   tempEau: '', tempAir: '', ph: '', chloreLibre: '', chloreCombine: '',
   chloreTotal: '', turbidite: '', redox: '', cyanurate: '', tauxChlorure: '',
   th: '', tac: '', volumeReactif: '', debitRecyclage: '',
@@ -69,6 +71,16 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
 
   const previewStatus = form.ph && form.chloreLibre
     ? computeStatus(parseFloat(form.ph), parseFloat(form.chloreLibre), parseFloat(form.chloreCombine || '0'))
+    : null
+
+  const bassinActif = bassins.find(b => String(b.id) === form.bassinId)
+  const previewChloreActif = (form.chloreLibre && form.ph && form.tempEau)
+    ? calcChloreActif(
+        parseFloat(form.chloreLibre),
+        parseFloat(form.ph),
+        parseFloat(form.tempEau),
+        (bassinActif?.mineralisationEau ?? 'normale') as 'normale' | 'forte'
+      )
     : null
 
   const handleSave = async () => {
@@ -250,6 +262,16 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
             </div>
             <Input label="Heure" value={form.heure} onChange={e => upd('heure', e.target.value)} type="time" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Point de prélèvement</label>
+              <select style={selectStyle} value={form.pointPrelevement} onChange={e => upd('pointPrelevement', e.target.value)}>
+                <option value="">— Principal —</option>
+                <option value="A">Point A</option>
+                <option value="B">Point B</option>
+                <option value="C">Point C</option>
+                <option value="D">Point D</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Transparence</label>
               <select style={selectStyle} value={form.transparence} onChange={e => upd('transparence', e.target.value)}>
                 {['Excellente', 'Bonne', 'Moyenne', 'Mauvaise'].map(v => <option key={v}>{v}</option>)}
@@ -301,10 +323,24 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
             </div>
           </div>
 
-          {previewStatus && (
-            <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
-              <Badge status={previewStatus} small />
+          {(previewStatus || previewChloreActif !== null) && (
+            <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              {previewStatus && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
+                  <Badge status={previewStatus} small />
+                </div>
+              )}
+              {previewChloreActif !== null && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Chlore libre actif :</span>
+                  <span style={{
+                    fontFamily: 'DM Mono', fontWeight: 700, fontSize: 13,
+                    color: previewChloreActif >= 0.4 ? 'var(--green)' : previewChloreActif >= 0.2 ? 'var(--orange)' : 'var(--red)',
+                  }}>{previewChloreActif} mg/L</span>
+                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>(réglementaire ≥ 0,4)</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -328,7 +364,7 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
               <table className="data-table">
                 <thead>
                   <tr>
-                    {['Date', 'Heure', 'Bassin', 'pH', 'Cl libre', 'Cl combiné', 'T° eau', 'TH', 'TAC', 'Statut', 'Validation', ''].map(h => (
+                    {['Date', 'Heure', 'Bassin', 'Point', 'pH', 'Cl libre', 'Cl actif', 'Cl combiné', 'T° eau', 'TH', 'TAC', 'Statut', 'Validation', ''].map(h => (
                       <th key={h}>{h}</th>
                     ))}
                   </tr>
@@ -339,8 +375,12 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
                       <td style={{ fontFamily: 'DM Mono' }}>{r.date}</td>
                       <td style={{ fontFamily: 'DM Mono', color: 'var(--text2)' }}>{r.heure}</td>
                       <td style={{ fontWeight: 600 }}>{r.bassinNom}</td>
+                      <td style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--accent)' }}>{r.pointPrelevement || '—'}</td>
                       <td style={{ fontFamily: 'DM Mono', color: r.ph >= 7.1 && r.ph <= 7.6 ? 'var(--green)' : r.ph <= 7.8 ? 'var(--orange)' : 'var(--red)' }}>{r.ph}</td>
                       <td style={{ fontFamily: 'DM Mono', color: r.chloreLibre >= 0.4 && r.chloreLibre <= 1.4 ? 'var(--green)' : 'var(--red)' }}>{r.chloreLibre}</td>
+                      <td style={{ fontFamily: 'DM Mono', fontSize: 12, color: r.chloreActif != null ? (r.chloreActif >= 0.4 ? 'var(--green)' : r.chloreActif >= 0.2 ? 'var(--orange)' : 'var(--red)') : 'var(--text3)' }}>
+                        {r.chloreActif != null ? `${r.chloreActif}` : '—'}
+                      </td>
                       <td style={{ fontFamily: 'DM Mono', color: (r.chloreCombine ?? 0) < 0.6 ? 'var(--green)' : (r.chloreCombine ?? 0) < 0.8 ? 'var(--orange)' : 'var(--red)' }}>{r.chloreCombine ?? '—'}</td>
                       <td style={{ fontFamily: 'DM Mono' }}>{r.tempEau}°</td>
                       <td style={{ fontFamily: 'DM Mono' }}>{r.th ?? '—'}</td>
@@ -390,7 +430,11 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div>
                     <span style={{ fontWeight: 700, fontSize: 15 }}>{r.bassinNom}</span>
-                    <span style={{ color: 'var(--text3)', fontSize: 13, marginLeft: 8 }}>{r.heure} — {r.transparence}</span>
+                    <span style={{ color: 'var(--text3)', fontSize: 13, marginLeft: 8 }}>
+                      {r.heure}
+                      {r.pointPrelevement && <span style={{ marginLeft: 6, fontWeight: 600, color: 'var(--accent)' }}>· Pt {r.pointPrelevement}</span>}
+                      {' '}— {r.transparence}
+                    </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Badge status={r.status} />
@@ -428,6 +472,10 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
                   {r.tauxChlorure !== null && <Metric label="Chlorure" value={r.tauxChlorure} unit="mg/L" />}
                   <Metric label="Vol. réactif" value={r.volumeReactif} unit="L" />
                   <Metric label="Débit recyclage" value={r.debitRecyclage} unit="m³/h" />
+                  {r.chloreActif !== null && r.chloreActif !== undefined && (
+                    <Metric label="Cl actif" value={r.chloreActif} unit="mg/L"
+                      status={r.chloreActif >= 0.4 ? 'ok' : r.chloreActif >= 0.2 ? 'warn' : 'bad'} />
+                  )}
                 </div>
                 <div style={{ marginTop: 12, padding: '8px 12px', background: 'var(--surface2)', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Icon name="info" size={12} color="var(--text3)" />

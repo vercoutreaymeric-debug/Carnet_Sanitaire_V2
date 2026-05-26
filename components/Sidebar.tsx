@@ -26,6 +26,7 @@ export default function Sidebar({ open, onClose, alertCount = 0 }: SidebarProps)
     { href: '/releves',       key: 'releves',      icon: 'water' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
     { href: '/frequentation', key: 'frequentation',icon: 'people' as const,   roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
     { href: '/interventions', key: 'interventions', icon: 'wrench' as const,  roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
+    { href: '/traitements',   key: 'traitements',  icon: 'flask' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
     { href: '/bassins',       key: 'bassins',      icon: 'pool' as const,     roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
     { href: '/contacts',      key: 'contacts',     icon: 'phone' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
     { href: '/statistiques',  key: 'statistiques', icon: 'chart' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'visualisateur', 'controleur_ars'] },

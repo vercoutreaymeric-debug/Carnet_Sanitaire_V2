@@ -14,7 +14,8 @@ import type { Bassin } from '@/types'
 interface Props { initialData: Bassin[] }
 
 const emptyForm = {
-  nom: '', type: 'couvert', longueur: '', largeur: '', profMin: '', profMax: '',
+  nom: '', type: 'couvert', typeReglementaire: '', mineralisationEau: 'normale',
+  longueur: '', largeur: '', profMin: '', profMax: '',
   surfSuperieure: '', surfInferieure: '', volumeTotal: '', debitReglementaire: '', debitInstallation: '',
   traitementPrincipal: '', typeStabilisant: '', typeMesure: '',
 }
@@ -154,6 +155,8 @@ export default function BassinsClient({ initialData }: Props) {
 
   const toForm = (b: Bassin): BassinForm => ({
     nom: b.nom, type: b.type,
+    typeReglementaire: b.typeReglementaire ?? '',
+    mineralisationEau: b.mineralisationEau ?? 'normale',
     longueur: String(b.longueur ?? ''), largeur: String(b.largeur ?? ''),
     profMin: String(b.profMin ?? ''), profMax: String(b.profMax ?? ''),
     surfSuperieure: String(b.surfSuperieure ?? ''), surfInferieure: String(b.surfInferieure ?? ''),
@@ -217,6 +220,23 @@ export default function BassinsClient({ initialData }: Props) {
           <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Désignation</label>
           <select value={form.type} onChange={e => upd('type', e.target.value)} style={selectStyle}>
             {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Type réglementaire</label>
+          <select value={form.typeReglementaire} onChange={e => upd('typeReglementaire', e.target.value)} style={selectStyle}>
+            <option value="">— Non renseigné —</option>
+            <option value="A">A — Piscines accès libre</option>
+            <option value="B">B — Pataugeoires</option>
+            <option value="C">C — Bassins couverts sportifs</option>
+            <option value="D">D — Bassins plein air</option>
+          </select>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>Minéralisation eau</label>
+          <select value={form.mineralisationEau} onChange={e => upd('mineralisationEau', e.target.value)} style={selectStyle}>
+            <option value="normale">Normale (&lt; 1 g/L)</option>
+            <option value="forte">Forte (≥ 1 g/L)</option>
           </select>
         </div>
         <Input label="Longueur" value={form.longueur} onChange={e => upd('longueur', e.target.value)} type="number" unit="m" step={0.1} />
@@ -357,9 +377,21 @@ export default function BassinsClient({ initialData }: Props) {
             <div style={{ background: 'var(--accent)22', borderRadius: 8, padding: 8 }}>
               <Icon name="pool" size={18} color="var(--accent)" />
             </div>
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <h3 style={{ fontWeight: 700, fontSize: 15 }}>{b.nom}</h3>
-              <span style={{ fontSize: 12, color: 'var(--text3)' }}>Bassin {b.type}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12, color: 'var(--text3)' }}>Bassin {b.type}</span>
+                {b.typeReglementaire && (
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: 'var(--accent)18', color: 'var(--accent)', border: '1px solid var(--accent)33' }}>
+                    Type {b.typeReglementaire}
+                  </span>
+                )}
+                {b.mineralisationEau === 'forte' && (
+                  <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: '#f59e0b18', color: '#d97706', border: '1px solid #f59e0b33' }}>
+                    Minéralisation forte
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

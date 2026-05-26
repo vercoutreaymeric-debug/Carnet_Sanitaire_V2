@@ -3,7 +3,7 @@ type IconName =
   | 'pool' | 'people' | 'wrench' | 'menu' | 'close' | 'plus' | 'check'
   | 'chevronDown' | 'save' | 'info' | 'calendar' | 'edit' | 'trash'
   | 'upload' | 'filter' | 'x' | 'qrcode' | 'download' | 'print'
-  | 'settings' | 'sun' | 'moon' | 'globe' | 'logout' | 'creditCard'
+  | 'settings' | 'sun' | 'moon' | 'globe' | 'logout' | 'creditCard' | 'flask'
 
 interface IconProps {
   name: IconName
@@ -44,6 +44,7 @@ const paths: Record<IconName, React.ReactNode> = {
   globe: <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></>,
   logout: <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
   creditCard: <><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></>,
+  flask: <><path d="M9 3h6M9 3v6l-4 10h14L15 9V3"/><path d="M6 17h12"/></>,
 }
 
 export default function Icon({ name, size = 18, color = 'currentColor', className }: IconProps) {

@@ -20,9 +20,11 @@ model Etablissement {
 }
 
 model Bassin {
-  id                   Int      @id @default(autoincrement())
+  id                   Int          @id @default(autoincrement())
   nom                  String
-  type                 String   @default("couvert")
+  type                 String       @default("couvert")
+  typeReglementaire    String?      // A | B | C | D (selon arrêté 26/05/21)
+  mineralisationEau    String?      // normale | forte
   longueur             Float?
   largeur              Float?
   profMin              Float?
@@ -32,12 +34,13 @@ model Bassin {
   volumeTotal          Float?
   debitReglementaire   Float?
   debitInstallation    Float?
-  traitementPrincipal  String?  // Chlore, Brome, PHMB, Sel/Électrolyse, UV, Minéralisation
-  typeStabilisant      String?  // Magnésium, Sel de mer, Sel minéral, Autre — si Minéralisation
-  typeMesure           String?  // analyseur (réglementaire) | ponctuelle (non réglementaire)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  traitementPrincipal  String?      // Chlore, Brome, PHMB, Sel/Électrolyse, UV, Minéralisation
+  typeStabilisant      String?      // Magnésium, Sel de mer, Sel minéral, Autre — si Minéralisation
+  typeMesure           String?      // analyseur (réglementaire) | ponctuelle (non réglementaire)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
   releves              Releve[]
+  traitements          Traitement[]
 }
 
 model Releve {
@@ -58,8 +61,10 @@ model Releve {
   redox          Float?   // potentiel d'oxydoréduction (mV) — obligatoire si analyseur
   cyanurate      Float?   // stabilisant chlore (mg/L) — piscines plein air
   tauxChlorure   Float?   // chlorure (mg/L) — piscines sel/électrolyse
+  pointPrelevement String?  // point A, B, C...
   th             Float?
   tac            Float?
+  chloreActif    Float?   // calculé selon formule réglementaire
   volumeReactif  Float?
   debitRecyclage Float?
   status         String
@@ -75,6 +80,7 @@ model Frequentation {
   scolaire          Int      @default(0)
   club              Int      @default(0)
   publicCount       Int      @default(0)
+  autre             Int      @default(0)
   total             Int      @default(0)
   reportEau         Float?
   releveEau         Float?
@@ -125,6 +131,24 @@ model Abonnement {
   maxUtilisateurs  Int       @default(10)
   notes            String    @default("")           // note interne CIFEC
   updatedAt        DateTime  @updatedAt
+}
+
+model Traitement {
+  id                    Int      @id @default(autoincrement())
+  date                  String
+  heure                 String?
+  bassinId              Int
+  bassin                Bassin   @relation(fields: [bassinId], references: [id], onDelete: Cascade)
+  bassinNom             String
+  quantiteStabilisant   Float?
+  uniteStabilisant      String?  // litre | kg | galet
+  quantiteDesinfectant  Float?
+  uniteDesinfectant     String?  // litre | kg | galet
+  quantiteCorrecteurPh  Float?
+  uniteCorrecteurPh     String?  // litre | kg | galet
+  debitRecyclage        Float?
+  notes                 String?
+  createdAt             DateTime @default(now())
 }
 
 model AuditLog {

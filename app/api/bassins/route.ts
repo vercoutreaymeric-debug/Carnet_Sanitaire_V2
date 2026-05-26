@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
         traitementPrincipal: body.traitementPrincipal || null,
         typeStabilisant: body.typeStabilisant || null,
         typeMesure: body.typeMesure || null,
+        typeReglementaire: body.typeReglementaire || null,
+        mineralisationEau: body.mineralisationEau || null,
       },
     })
     return NextResponse.json(bassin, { status: 201 })

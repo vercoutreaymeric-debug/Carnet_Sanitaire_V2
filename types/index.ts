@@ -5,6 +5,7 @@ export interface Releve {
   bassinNom: string
   heure: string
   transparence: string
+  pointPrelevement: string | null
   tempEau: number
   tempAir: number | null
   ph: number
@@ -17,6 +18,7 @@ export interface Releve {
   tauxChlorure: number | null
   th: number | null
   tac: number | null
+  chloreActif: number | null
   volumeReactif: number | null
   debitRecyclage: number | null
   status: 'conforme' | 'attention' | 'nonconforme'
@@ -30,6 +32,8 @@ export interface Bassin {
   id: number
   nom: string
   type: string
+  typeReglementaire: string | null
+  mineralisationEau: string | null
   longueur: number | null
   largeur: number | null
   profMin: number | null
@@ -52,6 +56,7 @@ export interface Frequentation {
   scolaire: number
   club: number
   publicCount: number
+  autre: number
   total: number
   reportEau: number | null
   releveEau: number | null

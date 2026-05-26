@@ -13,7 +13,7 @@ import type { Frequentation } from '@/types'
 
 interface Props { initialData: Frequentation[] }
 
-const emptyForm = { date: todayISO(), scolaire: '', club: '', publicCount: '', reportEau: '', releveEau: '' }
+const emptyForm = { date: todayISO(), scolaire: '', club: '', publicCount: '', autre: '', reportEau: '', releveEau: '' }
 
 export default function FrequentationClient({ initialData }: Props) {
   const [data, setData] = useState<Frequentation[]>(initialData)
@@ -28,7 +28,7 @@ export default function FrequentationClient({ initialData }: Props) {
 
   const upd = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
-  const total = (parseInt(form.scolaire) || 0) + (parseInt(form.club) || 0) + (parseInt(form.publicCount) || 0)
+  const total = (parseInt(form.scolaire) || 0) + (parseInt(form.club) || 0) + (parseInt(form.publicCount) || 0) + (parseInt(form.autre) || 0)
   const totalEau = (parseFloat(form.releveEau) || 0) - (parseFloat(form.reportEau) || 0)
   const litresPrev = total > 0 && totalEau > 0 ? Math.round((totalEau / total) * 1000 * 10) / 10 : null
 
@@ -102,6 +102,7 @@ export default function FrequentationClient({ initialData }: Props) {
             <Input label="Scolaire" value={form.scolaire} onChange={e => upd('scolaire', e.target.value)} type="number" unit="pers." />
             <Input label="Club" value={form.club} onChange={e => upd('club', e.target.value)} type="number" unit="pers." />
             <Input label="Public" value={form.publicCount} onChange={e => upd('publicCount', e.target.value)} type="number" unit="pers." />
+            <Input label="Autre" value={form.autre} onChange={e => upd('autre', e.target.value)} type="number" unit="pers." />
           </div>
           {total > 0 && (
             <div style={{ margin: '12px 0 4px', padding: '10px 14px', background: 'var(--surface3)', borderRadius: 8 }}>
@@ -179,6 +180,7 @@ export default function FrequentationClient({ initialData }: Props) {
               <Metric label="Scolaire" value={f.scolaire} />
               <Metric label="Club" value={f.club} />
               <Metric label="Public" value={f.publicCount} />
+              {(f.autre ?? 0) > 0 && <Metric label="Autre" value={f.autre} />}
               {f.totalEau !== null && <Metric label="Eau ajoutée" value={f.totalEau} unit="m³" />}
               {f.litresParBaigneur !== null && (
                 <Metric label="L / baigneur" value={f.litresParBaigneur} unit="L" status={(f.litresParBaigneur ?? 0) >= 30 ? 'ok' : 'warn'} />
