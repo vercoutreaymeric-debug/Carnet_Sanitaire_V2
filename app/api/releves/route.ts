@@ -23,10 +23,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
+  const chloreCombineVal = body.chloreCombine !== '' && body.chloreCombine != null
+    ? parseFloat(body.chloreCombine) : null
   const status = computeStatus(
     parseFloat(body.ph),
     parseFloat(body.chloreLibre),
-    parseFloat(body.chloreCombine ?? 0)
+    chloreCombineVal
   )
   const releve = await prisma.releve.create({
     data: {

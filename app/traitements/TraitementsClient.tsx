@@ -178,6 +178,7 @@ export default function TraitementsClient({ initialData, bassins }: { initialDat
 
       {/* Liste */}
       <Card style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <table className="data-table">
           <thead>
             <tr>
@@ -217,6 +218,7 @@ export default function TraitementsClient({ initialData, bassins }: { initialDat
             ))}
           </tbody>
         </table>
+        </div>
       </Card>
     </div>
   )

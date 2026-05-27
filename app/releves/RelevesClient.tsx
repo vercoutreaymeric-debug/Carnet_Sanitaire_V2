@@ -11,7 +11,7 @@ import HelpPanel from '@/components/HelpPanel'
 import QRScanner from '@/components/QRScanner'
 import { CanCreate, CanDeleteReleve, CanValider } from '@/components/RoleGate'
 import { useAuth } from '@/contexts/AuthContext'
-import { todayISO, computeStatus } from '@/lib/utils'
+import { todayISO, computeStatus, getStatusRaisons } from '@/lib/utils'
 import { calcChloreActif } from '@/lib/chloreActif'
 import type { Releve, Bassin } from '@/types'
 
@@ -69,9 +69,13 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
 
   const upd = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
+  const chloreCombinePreview = form.chloreCombine !== '' ? parseFloat(form.chloreCombine) : null
   const previewStatus = form.ph && form.chloreLibre
-    ? computeStatus(parseFloat(form.ph), parseFloat(form.chloreLibre), parseFloat(form.chloreCombine || '0'))
+    ? computeStatus(parseFloat(form.ph), parseFloat(form.chloreLibre), chloreCombinePreview)
     : null
+  const previewRaisons = (form.ph && form.chloreLibre && previewStatus && previewStatus !== 'conforme')
+    ? getStatusRaisons(parseFloat(form.ph), parseFloat(form.chloreLibre), chloreCombinePreview)
+    : []
 
   const bassinActif = bassins.find(b => String(b.id) === form.bassinId)
   const pointsBassin: string[] = (() => { try { return JSON.parse(bassinActif?.pointsPrelevement || '[]') } catch { return [] } })()
@@ -323,29 +327,80 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
             </div>
           </div>
 
-          <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            {previewStatus ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
-                <Badge status={previewStatus} small />
-              </div>
-            ) : (
-              <span style={{ fontSize: 12, color: 'var(--text3)' }}>Renseignez pH + Chlore libre pour voir le statut</span>
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 12, color: 'var(--text2)' }}>Chlore libre actif :</span>
-              {previewChloreActif !== null ? (
-                <>
-                  <span style={{
-                    fontFamily: 'DM Mono', fontWeight: 700, fontSize: 13,
-                    color: previewChloreActif >= 0.4 ? 'var(--green)' : previewChloreActif >= 0.2 ? 'var(--orange)' : 'var(--red)',
-                  }}>{previewChloreActif} mg/L</span>
-                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>(min. ≥ 0,4)</span>
-                </>
-              ) : (
-                <span style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>— renseignez pH, Cl libre et T° eau</span>
-              )}
+          {/* ── Notice critères de conformité ─────────────────────────── */}
+          <details style={{ marginTop: 8 }}>
+            <summary style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer', userSelect: 'none', fontWeight: 500 }}>
+              ℹ️ Critères de conformité (Arrêté du 7 avril 1981)
+            </summary>
+            <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 6, fontSize: 12, color: 'var(--text2)' }}>
+              <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <th style={{ textAlign: 'left', paddingBottom: 4, fontWeight: 600 }}>Paramètre</th>
+                    <th style={{ textAlign: 'center', color: 'var(--green)', paddingBottom: 4 }}>✅ Conforme</th>
+                    <th style={{ textAlign: 'center', color: 'var(--orange)', paddingBottom: 4 }}>⚠️ Attention</th>
+                    <th style={{ textAlign: 'center', color: 'var(--red)', paddingBottom: 4 }}>❌ Non conforme</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['pH',           '7,1 – 7,6',     '7,0–7,1 ou 7,6–7,8', '< 7,0 ou > 7,8'],
+                    ['Chlore libre', '≥ 0,5 mg/L',    '0,4 – 0,5 mg/L',     '< 0,4 ou > 1,4 mg/L'],
+                    ['Chlore combiné','≤ 0,6 mg/L',   '0,6 – 0,8 mg/L',     '> 0,8 mg/L'],
+                  ].map(([param, ok, warn, bad]) => (
+                    <tr key={param} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '4px 0', fontWeight: 500 }}>{param}</td>
+                      <td style={{ textAlign: 'center', color: 'var(--green)' }}>{ok}</td>
+                      <td style={{ textAlign: 'center', color: 'var(--orange)' }}>{warn}</td>
+                      <td style={{ textAlign: 'center', color: 'var(--red)' }}>{bad}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </details>
+
+          {/* ── Encart statut + chlore actif ──────────────────────────── */}
+          <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              {previewStatus ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Statut estimé :</span>
+                  <Badge status={previewStatus} small />
+                </div>
+              ) : (
+                <span style={{ fontSize: 12, color: 'var(--text3)' }}>Renseignez pH + Chlore libre pour voir le statut</span>
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 12, color: 'var(--text2)' }}>Chlore libre actif :</span>
+                {previewChloreActif !== null ? (
+                  <>
+                    <span style={{
+                      fontFamily: 'DM Mono', fontWeight: 700, fontSize: 13,
+                      color: previewChloreActif >= 0.4 ? 'var(--green)' : previewChloreActif >= 0.2 ? 'var(--orange)' : 'var(--red)',
+                    }}>{previewChloreActif} mg/L</span>
+                    <span style={{ fontSize: 11, color: 'var(--text3)' }}>(min. ≥ 0,4)</span>
+                  </>
+                ) : (
+                  <span style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>— renseignez pH, Cl libre et T° eau</span>
+                )}
+              </div>
+            </div>
+            {/* Raisons de non-conformité ou d'attention */}
+            {previewRaisons.length > 0 && (
+              <div style={{
+                background: previewStatus === 'nonconforme' ? 'rgba(239,68,68,0.08)' : 'rgba(251,191,36,0.08)',
+                border: `1px solid ${previewStatus === 'nonconforme' ? 'var(--red)' : 'var(--orange)'}`,
+                borderRadius: 6, padding: '6px 10px',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: previewStatus === 'nonconforme' ? 'var(--red)' : 'var(--orange)', marginBottom: 4 }}>
+                  {previewStatus === 'nonconforme' ? '❌ Valeur(s) hors norme :' : '⚠️ Valeur(s) à surveiller :'}
+                </p>
+                {previewRaisons.map((r, i) => (
+                  <p key={i} style={{ fontSize: 11, color: 'var(--text2)', margin: 0 }}>• {r}</p>
+                ))}
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
