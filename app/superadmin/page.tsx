@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Card from '@/components/Card'
 import Icon from '@/components/Icon'
 import NotifyButton from './NotifyButton'
+import RecalculButton from './RecalculButton'
 import CredentialsForm from './CredentialsForm'
 import AbonnementForm from './AbonnementForm'
 export const dynamic = 'force-dynamic'
@@ -92,6 +93,19 @@ export default async function SuperAdminPage() {
           Modifiez votre identifiant et/ou mot de passe superadmin. Le mot de passe actuel est toujours requis pour confirmer.
         </p>
         <CredentialsForm currentUsername={superadminUser?.username ?? 'superadmin'} />
+      </Card>
+
+      {/* Recalcul statuts */}
+      <Card>
+        <h3 style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+          🔄 Recalcul des statuts de conformité
+        </h3>
+        <p style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 16 }}>
+          Recalcule le statut (conforme / attention / non conforme) de tous les relevés existants
+          avec les seuils réglementaires à jour (Arrêté du 7 avril 1981 modifié).
+          À utiliser après une mise à jour des règles de conformité.
+        </p>
+        <RecalculButton />
       </Card>
 
       {/* Notifications */}

@@ -11,6 +11,7 @@ import { CanCreate, CanEdit, CanDelete } from '@/components/RoleGate'
 import { useAuth } from '@/contexts/AuthContext'
 import { todayISO } from '@/lib/utils'
 import type { Intervention } from '@/types'
+import PiecesJointes from '@/components/PiecesJointes'
 
 interface Props {
   initialData: Intervention[]
@@ -32,6 +33,7 @@ export default function InterventionsClient({ initialData, bassins }: Props) {
   const [filterBassin, setFilterBassin] = useState('Tous')
   const [form, setForm] = useState({ ...emptyForm, bassin: bassins[0] ?? 'Grand bassin' })
   const [saving, setSaving] = useState(false)
+  const [expandedPJ, setExpandedPJ] = useState<number | null>(null)
   const router = useRouter()
 
   const upd = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
@@ -170,11 +172,12 @@ export default function InterventionsClient({ initialData, bassins }: Props) {
             <table className="data-table">
               <thead>
                 <tr>
-                  {['Date', 'Type', 'Bassin', 'Description', 'Agent', 'Statut', ''].map(h => <th key={h}>{h}</th>)}
+                  {['Date', 'Type', 'Bassin', 'Description', 'Agent', 'Statut', '📎', ''].map(h => <th key={h}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(iv => (
+                  <>
                   <tr key={iv.id}>
                     <td style={{ fontFamily: 'DM Mono', color: 'var(--text2)', whiteSpace: 'nowrap' }}>{iv.date}{iv.heure ? ` ${iv.heure}` : ''}</td>
                     <td>
@@ -201,6 +204,13 @@ export default function InterventionsClient({ initialData, bassins }: Props) {
                       )}
                     </td>
                     <td>
+                      <button
+                        onClick={() => setExpandedPJ(expandedPJ === iv.id ? null : iv.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: 4, opacity: expandedPJ === iv.id ? 1 : 0.5 }}
+                        title="Pièces jointes"
+                      >📎</button>
+                    </td>
+                    <td>
                       <CanDelete>
                         <button onClick={() => handleDelete(iv.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', padding: 4 }} title="Supprimer">
                           <Icon name="trash" size={14} />
@@ -208,6 +218,14 @@ export default function InterventionsClient({ initialData, bassins }: Props) {
                       </CanDelete>
                     </td>
                   </tr>
+                  {expandedPJ === iv.id && (
+                    <tr key={`pj-${iv.id}`}>
+                      <td colSpan={8} style={{ background: 'var(--surface2)', padding: '12px 20px' }}>
+                        <PiecesJointes module="intervention" moduleId={iv.id} canEdit={canEdit} />
+                      </td>
+                    </tr>
+                  )}
+                  </>
                 ))}
               </tbody>
             </table>

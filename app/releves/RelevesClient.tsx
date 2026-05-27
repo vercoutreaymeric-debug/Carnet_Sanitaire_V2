@@ -12,6 +12,7 @@ import QRScanner from '@/components/QRScanner'
 import { CanCreate, CanDeleteReleve, CanValider } from '@/components/RoleGate'
 import { useAuth } from '@/contexts/AuthContext'
 import { todayISO, computeStatus, getStatusRaisons } from '@/lib/utils'
+import PiecesJointes from '@/components/PiecesJointes'
 import { calcChloreActif } from '@/lib/chloreActif'
 import type { Releve, Bassin } from '@/types'
 
@@ -545,6 +546,7 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
                     </span>
                   )}
                 </div>
+                <PiecesJointes module="releve" moduleId={r.id} canEdit={!r.valide} />
               </Card>
             ))}
           </div>

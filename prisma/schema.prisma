@@ -152,6 +152,17 @@ model Traitement {
   createdAt             DateTime @default(now())
 }
 
+model PieceJointe {
+  id        Int      @id @default(autoincrement())
+  module    String   // "releve" | "intervention" | "traitement"
+  moduleId  Int
+  nom       String   // nom original du fichier
+  type      String   // mimetype (image/jpeg, application/pdf…)
+  taille    Int      // taille en octets
+  data      String   // contenu base64 (max ~5 Mo)
+  createdAt DateTime @default(now())
+}
+
 model AuditLog {
   id        Int      @id @default(autoincrement())
   action    String   // CREATE | UPDATE | DELETE | RESTORE
