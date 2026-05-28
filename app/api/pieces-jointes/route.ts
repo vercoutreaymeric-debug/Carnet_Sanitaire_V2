@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 Mo
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
 
+function isAuthenticated(): boolean {
+  try {
+    const session = cookies().get('cs_session')?.value
+    if (!session) return false
+    const parts = atob(session).split('|')
+    const secret = process.env.AUTH_SECRET || 'cs-secret-key'
+    return parts.length >= 3 && parts[2] === secret
+  } catch { return false }
+}
+
 // GET /api/pieces-jointes?module=releve&moduleId=1
 export async function GET(req: NextRequest) {
+  if (!isAuthenticated()) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const module_ = searchParams.get('module')
   const moduleId = searchParams.get('moduleId')
@@ -22,6 +34,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/pieces-jointes  (multipart/form-data)
 export async function POST(req: NextRequest) {
+  if (!isAuthenticated()) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   try {
     const formData = await req.formData()
     const file = formData.get('file') as File | null

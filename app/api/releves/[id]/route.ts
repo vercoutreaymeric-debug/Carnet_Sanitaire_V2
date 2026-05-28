@@ -5,9 +5,13 @@ import { logAction } from '@/lib/audit'
 
 function getRole(): string | null {
   try {
-    const session = cookies().get('session')?.value
+    const session = cookies().get('cs_session')?.value
     if (!session) return null
-    return JSON.parse(Buffer.from(session, 'base64').toString()).role ?? null
+    const decoded = atob(session)
+    const parts = decoded.split('|')
+    const secret = process.env.AUTH_SECRET || 'cs-secret-key'
+    if (parts.length < 3 || parts[2] !== secret) return null
+    return parts[1] ?? null
   } catch { return null }
 }
 
