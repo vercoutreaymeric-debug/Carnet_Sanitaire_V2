@@ -3,6 +3,24 @@ import type { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, hashPasswordLegacy, verifyPassword, makeSessionToken } from '@/lib/password'
 
+// ── Vérification Cloudflare Turnstile ───────────────────────────────────────
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY
+  if (!secret) return true // si pas configuré, on laisse passer (dev sans clé)
+
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, response: token, remoteip: ip }),
+    })
+    const data = await res.json()
+    return data.success === true
+  } catch {
+    return false
+  }
+}
+
 // ── Rate limiting simple en mémoire ─────────────────────────────────────────
 const attempts = new Map<string, { count: number; resetAt: number }>()
 const MAX_ATTEMPTS = 5
@@ -69,7 +87,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { username, password } = await req.json()
+    const { username, password, turnstileToken } = await req.json()
+
+    // Vérification anti-robot Turnstile
+    if (!turnstileToken || !(await verifyTurnstile(turnstileToken, ip))) {
+      return NextResponse.json(
+        { error: 'Vérification anti-robot échouée. Actualisez la page et réessayez.' },
+        { status: 400 }
+      )
+    }
+
     await seedUsers()
 
     const user = await prisma.user.findUnique({ where: { username } })
