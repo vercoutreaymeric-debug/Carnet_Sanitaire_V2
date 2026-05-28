@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (body.nom !== undefined) data.nom = body.nom
   if (body.email !== undefined) data.email = body.email
   if (body.role) data.role = body.role
-  if (body.password) data.password = hashPassword(body.password)
+  if (body.password) data.password = await hashPassword(body.password)
   const user = await prisma.user.update({ where: { id: parseInt(params.id) }, data, select: { id: true, username: true, role: true, nom: true, email: true } })
   await logAction('UPDATE', 'user', `Utilisateur modifié : ${user.username} (${user.role})`)
   return NextResponse.json(user)

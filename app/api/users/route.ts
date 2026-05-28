@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.user.findUnique({ where: { username: body.username } })
     if (existing) return NextResponse.json({ error: 'Identifiant déjà utilisé' }, { status: 409 })
     const user = await prisma.user.create({
-      data: { username: body.username, password: hashPassword(body.password), role: body.role, nom: body.nom || '', email: body.email || '' },
+      data: { username: body.username, password: await hashPassword(body.password), role: body.role, nom: body.nom || '', email: body.email || '' },
       select: { id: true, username: true, role: true, nom: true, email: true },
     })
     await logAction('CREATE', 'user', `Utilisateur créé : ${user.username} (${user.role})`)

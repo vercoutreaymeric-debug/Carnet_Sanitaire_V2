@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { username: session.username } })
   if (!user) return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 })
 
-  if (!verifyPassword(currentPassword, user.password)) {
+  if (!await verifyPassword(currentPassword, user.password)) {
     return NextResponse.json({ error: 'Mot de passe actuel incorrect' }, { status: 401 })
   }
 
@@ -48,7 +48,7 @@ export async function PATCH(req: NextRequest) {
   // ── Mise à jour ────────────────────────────────────────────────────────────
   const data: Record<string, string> = {}
   if (newUsername && newUsername !== user.username) data.username = newUsername
-  if (newPassword) data.password = hashPassword(newPassword)
+  if (newPassword) data.password = await hashPassword(newPassword)
 
   const updated = await prisma.user.update({
     where: { id: user.id },
