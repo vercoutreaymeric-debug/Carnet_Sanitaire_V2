@@ -28,9 +28,7 @@ const TYPE_OPTIONS = ['société', 'association', 'collectivité', 'EPCI', 'autr
 const C_GROUPE = '#0097A7'
 const C_ORG    = '#00aeef'
 const C_ETAB   = '#10b981'
-const ORG_W    = 220  // px — largeur fixe carte organisme
-const ETAB_W   = 200  // px — largeur fixe carte établissement
-const GAP      = 16   // px — gap entre cartes
+const INDENT   = 36  // px par niveau d'indentation
 
 // ─── Formulaire input helper ──────────────────────────────────────────────────
 const inp = (s?: React.CSSProperties): React.CSSProperties => ({
@@ -38,132 +36,47 @@ const inp = (s?: React.CSSProperties): React.CSSProperties => ({
   background: 'var(--surface)', color: 'var(--text)', fontSize: 13, boxSizing: 'border-box', ...s,
 })
 
-// ─── Connecteur vertical ──────────────────────────────────────────────────────
-function VLine({ color, h = 28 }: { color: string; h?: number }) {
-  return <div style={{ width: 2, height: h, background: `${color}66`, flexShrink: 0, alignSelf: 'center' }} />
-}
-
-// ─── Ligne horizontale + enfants ─────────────────────────────────────────────
-function HBranch({ children, lineColor, cardW }: { children: React.ReactNode[]; lineColor: string; cardW: number }) {
-  const n = children.length
-  if (n === 0) return null
-
-  // Un seul enfant : juste une ligne verticale
-  if (n === 1) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <VLine color={lineColor} />
-      {children[0]}
-    </div>
-  )
-
-  // Plusieurs enfants : ligne horizontale + branches verticales
-  const totalW  = n * cardW + (n - 1) * GAP
-  const halfCard = cardW / 2
-
+// ─── Barre cascade ────────────────────────────────────────────────────────────
+function CascadeBar({
+  label, sublabel, color, indent, actions, addButton,
+}: {
+  label: string
+  sublabel?: string
+  color: string
+  indent: number
+  actions?: React.ReactNode
+  addButton?: React.ReactNode
+}) {
   return (
-    <div style={{ position: 'relative', display: 'flex', gap: GAP, justifyContent: 'center', paddingTop: 28 }}>
-      {/* Ligne horizontale de centre à centre */}
+    <div style={{ marginLeft: indent, marginBottom: 6 }}>
       <div style={{
-        position: 'absolute', top: 0,
-        left: halfCard, right: halfCard,
-        height: 2, background: `${lineColor}55`,
-      }} />
-      {children.map((child, i) => (
-        <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: cardW, flexShrink: 0 }}>
-          <VLine color={lineColor} />
-          {child}
+        background: color,
+        borderRadius: 9,
+        padding: '10px 14px 10px 18px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        boxShadow: `0 2px 8px ${color}44`,
+      }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', lineHeight: 1.2 }}>{label}</p>
+          {sublabel && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>{sublabel}</p>}
         </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Carte Groupe ─────────────────────────────────────────────────────────────
-function GroupeNode({ groupe, nbOrgs, nbEtabs }: { groupe: Groupe | null; nbOrgs: number; nbEtabs: number }) {
-  return (
-    <div style={{
-      background: `${C_GROUPE}18`, border: `2px solid ${C_GROUPE}44`,
-      borderRadius: 12, padding: '14px 28px', textAlign: 'center', minWidth: 260,
-    }}>
-      <p style={{ fontSize: 11, fontWeight: 700, color: C_GROUPE, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Groupe</p>
-      <p style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 6 }}>{groupe?.nom ?? 'Mon périmètre'}</p>
-      <p style={{ fontSize: 12, color: 'var(--text3)' }}>{nbOrgs} organisme{nbOrgs !== 1 ? 's' : ''} · {nbEtabs} établissement{nbEtabs !== 1 ? 's' : ''}</p>
-    </div>
-  )
-}
-
-// ─── Carte Organisme ─────────────────────────────────────────────────────────
-function OrgNode({ org, onEdit, onDelete, onAddEtab }: {
-  org: Organisme
-  onEdit: () => void
-  onDelete: () => void
-  onAddEtab: () => void
-}) {
-  return (
-    <div style={{
-      background: `${C_ORG}12`, border: `1.5px solid ${C_ORG}44`,
-      borderRadius: 10, padding: '12px 14px', width: ORG_W, boxSizing: 'border-box',
-    }}>
-      <p style={{ fontSize: 10, fontWeight: 700, color: C_ORG, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>Organisme</p>
-      <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 2 }}>{org.nom}</p>
-      <p style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 8 }}>
-        {org.type} · {org.etablissements.length} étab{org.etablissements.length !== 1 ? 's' : ''}
-        {org.users[0] ? ` · ${org.users[0].nom || org.users[0].username}` : ''}
-      </p>
-      <div style={{ display: 'flex', gap: 5, justifyContent: 'space-between' }}>
-        <button onClick={onAddEtab} style={{
-          flex: 1, background: `${C_ETAB}22`, color: C_ETAB, border: `1px solid ${C_ETAB}44`,
-          borderRadius: 6, padding: '4px 0', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-        }}>+ Étab</button>
-        <button onClick={onEdit} style={{
-          background: 'var(--surface2)', border: '1px solid var(--border)',
-          borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 11, color: 'var(--text2)',
-        }}>✏️</button>
-        <button onClick={onDelete} style={{
-          background: '#ef444415', border: '1px solid #ef444433',
-          borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 11, color: '#ef4444',
-        }}>🗑</button>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+          {addButton}
+          {actions}
+        </div>
       </div>
     </div>
   )
 }
 
-// ─── Carte Établissement ──────────────────────────────────────────────────────
-function EtabNode({ etab, onEdit, onDelete }: {
-  etab: Etab; onEdit: () => void; onDelete: () => void
-}) {
-  const sc = etab.abonnement ? (STATUT_COLOR[etab.abonnement.statut] ?? '#6b7280') : '#6b7280'
+function ActionBtn({ onClick, label, danger }: { onClick: () => void; label: string; danger?: boolean }) {
   return (
-    <div style={{
-      background: `${C_ETAB}0e`, border: `1.5px solid ${C_ETAB}33`,
-      borderRadius: 9, padding: '10px 12px', width: ETAB_W, boxSizing: 'border-box',
-    }}>
-      <p style={{ fontSize: 10, fontWeight: 700, color: C_ETAB, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>Établissement</p>
-      <p style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)', marginBottom: 3 }}>{etab.nom}</p>
-      {etab.abonnement && (
-        <div style={{ display: 'flex', gap: 4, marginBottom: 5, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 20, background: '#9333ea18', color: '#9333ea', border: '1px solid #9333ea33', fontWeight: 600 }}>
-            {etab.abonnement.plan}
-          </span>
-          <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 20, background: `${sc}18`, color: sc, border: `1px solid ${sc}33`, fontWeight: 600 }}>
-            {etab.abonnement.statut}
-          </span>
-        </div>
-      )}
-      <p style={{ fontSize: 10, color: 'var(--text3)', marginBottom: 8 }}>
-        {etab._count.users}u · {etab._count.bassins}b · {etab._count.releves}r
-      </p>
-      <div style={{ display: 'flex', gap: 5 }}>
-        <button onClick={onEdit} style={{
-          flex: 1, background: 'var(--surface2)', border: '1px solid var(--border)',
-          borderRadius: 6, padding: '3px 0', cursor: 'pointer', fontSize: 11, color: 'var(--text2)',
-        }}>✏️ Modifier</button>
-        <button onClick={onDelete} style={{
-          background: '#ef444415', border: '1px solid #ef444433',
-          borderRadius: 6, padding: '3px 7px', cursor: 'pointer', fontSize: 11, color: '#ef4444',
-        }}>🗑</button>
-      </div>
-    </div>
+    <button onClick={onClick} style={{
+      background: danger ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.2)',
+      border: 'none', borderRadius: 6,
+      padding: '4px 10px', cursor: 'pointer',
+      fontSize: 11, color: '#fff', fontWeight: 600,
+    }}>{label}</button>
   )
 }
 
@@ -287,59 +200,54 @@ export default function GroupeView({ groupe, organismes: initOrgs, groupeId }: {
         </div>
       )}
 
-      {/* ─── ORGANIGRAMME ───────────────────────────────────────────────────── */}
-      <div style={{ overflowX: 'auto', paddingBottom: 24 }}>
-        <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', minWidth: '100%' }}>
+      {/* ─── ORGANIGRAMME CASCADE ───────────────────────────────────────────── */}
+      <div style={{ paddingBottom: 24 }}>
 
-          {/* Nœud Groupe */}
-          <GroupeNode groupe={groupe} nbOrgs={organismes.length} nbEtabs={allEtabs.length} />
+        {/* Niveau 0 — Groupe */}
+        <CascadeBar
+          label={groupe?.nom ?? 'Mon périmètre'}
+          sublabel={`${organismes.length} organisme${organismes.length !== 1 ? 's' : ''} · ${allEtabs.length} établissement${allEtabs.length !== 1 ? 's' : ''}`}
+          color={C_GROUPE}
+          indent={0}
+          addButton={
+            <ActionBtn onClick={() => setShowCreateOrg(true)} label="+ Organisme" />
+          }
+        />
 
-          {/* Bouton créer organisme sous le groupe */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <VLine color={C_GROUPE} h={16} />
-            <button onClick={() => setShowCreateOrg(true)} style={{
-              background: `${C_GROUPE}18`, border: `1px dashed ${C_GROUPE}66`,
-              borderRadius: 8, padding: '5px 16px', cursor: 'pointer', fontSize: 12,
-              color: C_GROUPE, fontWeight: 600,
-            }}>+ Ajouter un organisme</button>
+        {/* Niveau 1 — Organismes */}
+        {organismes.map(org => (
+          <div key={org.id}>
+            <CascadeBar
+              label={org.nom}
+              sublabel={`${org.type} · ${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}${org.users[0] ? ` · ${org.users[0].nom || org.users[0].username}` : ''}`}
+              color={C_ORG}
+              indent={INDENT}
+              addButton={<ActionBtn onClick={() => setCreateEtabOrgId(org.id)} label="+ Étab" />}
+              actions={<>
+                <ActionBtn onClick={() => { setEditOrg(org); setEditOrgForm({ nom: org.nom, type: org.type, adresse: org.adresse, telephone: org.telephone }) }} label="✏️" />
+                <ActionBtn onClick={() => setDeleteOrg(org)} label="🗑" danger />
+              </>}
+            />
+
+            {/* Niveau 2 — Établissements */}
+            {org.etablissements.map(etab => {
+              const sc = etab.abonnement ? (STATUT_COLOR[etab.abonnement.statut] ?? '#10b981') : '#10b981'
+              return (
+                <CascadeBar
+                  key={etab.id}
+                  label={etab.nom}
+                  sublabel={`${etab.abonnement ? `${etab.abonnement.plan} · ${etab.abonnement.statut} · ` : ''}${etab._count.users} user · ${etab._count.bassins} bassin · ${etab._count.releves} relevé`}
+                  color={sc}
+                  indent={INDENT * 2}
+                  actions={<>
+                    <ActionBtn onClick={() => { setEditEtab({ orgId: org.id, etab }); setEditEtabForm({ nom: etab.nom, adresse: etab.adresse, telephone: etab.telephone }) }} label="✏️" />
+                    <ActionBtn onClick={() => setDeleteEtab({ orgId: org.id, etab })} label="🗑" danger />
+                  </>}
+                />
+              )
+            })}
           </div>
-
-          {organismes.length > 0 && (
-            <>
-              <VLine color={C_ORG} h={20} />
-
-              {/* Niveau Organismes */}
-              <HBranch lineColor={C_ORG} cardW={ORG_W}>
-                {organismes.map(org => (
-                  <div key={org.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-                    {/* Carte Organisme */}
-                    <OrgNode
-                      org={org}
-                      onEdit={() => { setEditOrg(org); setEditOrgForm({ nom: org.nom, type: org.type, adresse: org.adresse, telephone: org.telephone }) }}
-                      onDelete={() => setDeleteOrg(org)}
-                      onAddEtab={() => setCreateEtabOrgId(org.id)}
-                    />
-
-                    {/* Niveau Établissements */}
-                    {org.etablissements.length > 0 && (
-                      <HBranch lineColor={C_ETAB} cardW={ETAB_W}>
-                        {org.etablissements.map(etab => (
-                          <EtabNode
-                            key={etab.id}
-                            etab={etab}
-                            onEdit={() => { setEditEtab({ orgId: org.id, etab }); setEditEtabForm({ nom: etab.nom, adresse: etab.adresse, telephone: etab.telephone }) }}
-                            onDelete={() => setDeleteEtab({ orgId: org.id, etab })}
-                          />
-                        ))}
-                      </HBranch>
-                    )}
-                  </div>
-                ))}
-              </HBranch>
-            </>
-          )}
-        </div>
+        ))}
       </div>
 
       {/* ─── MODALS ─────────────────────────────────────────────────────────── */}
