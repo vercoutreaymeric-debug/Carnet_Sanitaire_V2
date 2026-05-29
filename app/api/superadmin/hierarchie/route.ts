@@ -8,7 +8,7 @@ export async function GET() {
   if (!session || session.role !== 'superadmin')
     return NextResponse.json({ error: 'Non autorisé' }, { status: 403 })
 
-  const [groupes, organismes, etablissements, users] = await Promise.all([
+  const [groupes, organismes, etablissements, users, bassins] = await Promise.all([
     prisma.groupe.findMany({
       orderBy: { nom: 'asc' },
       include: {
@@ -47,7 +47,15 @@ export async function GET() {
         groupe: { select: { id: true, nom: true } },
       },
     }),
+
+    prisma.bassin.findMany({
+      orderBy: { nom: 'asc' },
+      select: {
+        id: true, nom: true, type: true, etablissementId: true,
+        _count: { select: { releves: true } },
+      },
+    }),
   ])
 
-  return NextResponse.json({ groupes, organismes, etablissements, users })
+  return NextResponse.json({ groupes, organismes, etablissements, users, bassins })
 }
