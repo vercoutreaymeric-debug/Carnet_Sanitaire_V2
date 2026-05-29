@@ -63,6 +63,7 @@ export default function HierarchieManager() {
   const [selOrg, setSelOrg]         = useState<Organisme | null>(null)
   const [selEtab, setSelEtab]       = useState<Etablissement | null>(null)
   const [search, setSearch]         = useState('')
+  const [globalSearch, setGlobalSearch] = useState('')
 
   useEffect(() => {
     fetch('/api/superadmin/hierarchie')
@@ -79,13 +80,23 @@ export default function HierarchieManager() {
   if (loading) return <Card><p style={{ color: 'var(--text3)', fontSize: 13 }}>Chargement…</p></Card>
   if (!data)   return <Card><p style={{ color: '#ef4444', fontSize: 13 }}>Erreur de chargement.</p></Card>
 
-  // Données filtrées selon le niveau + recherche
+  // Recherche globale (tous niveaux)
+  const gq = globalSearch.toLowerCase()
+  const globalResults = gq ? {
+    groupes:        data.groupes.filter(g => g.nom.toLowerCase().includes(gq)),
+    organismes:     data.organismes.filter(o => o.nom.toLowerCase().includes(gq)),
+    etablissements: data.etablissements.filter(e => e.nom.toLowerCase().includes(gq) || (e.adresse || '').toLowerCase().includes(gq)),
+    bassins:        data.bassins.filter(b => b.nom.toLowerCase().includes(gq)),
+    users:          data.users.filter(u => u.username.toLowerCase().includes(gq) || u.nom.toLowerCase().includes(gq)),
+  } : null
+
+  // Données filtrées selon le niveau + recherche locale
   const q = search.toLowerCase()
   const organismes     = data.organismes.filter(o => (!selGroupe || o.groupeId === selGroupe.id) && (!q || o.nom.toLowerCase().includes(q)))
   const etablissements = data.etablissements.filter(e => (!selOrg || e.organismeId === selOrg.id) && (!q || e.nom.toLowerCase().includes(q)))
   const bassins        = data.bassins.filter(b => (!selEtab || b.etablissementId === selEtab.id) && (!q || b.nom.toLowerCase().includes(q)))
   const groupes        = data.groupes.filter(g => !q || g.nom.toLowerCase().includes(q))
-  const usersEtab     = selEtab ? data.users.filter(u => u.etablissementId === selEtab.id) : []
+  const usersEtab      = selEtab ? data.users.filter(u => u.etablissementId === selEtab.id) : []
 
   const row = (onClick?: () => void) => ({
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -97,9 +108,71 @@ export default function HierarchieManager() {
 
   return (
     <Card>
+      {/* ── Titre + recherche globale ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+        <h3 style={{ fontWeight: 700, fontSize: 16, flexShrink: 0 }}>Vue hiérarchique</h3>
+        <div style={{ position: 'relative', flex: 1, maxWidth: 340 }}>
+          <input
+            value={globalSearch}
+            onChange={e => setGlobalSearch(e.target.value)}
+            placeholder="Recherche générale…"
+            style={{
+              width: '100%', padding: '7px 32px 7px 12px', borderRadius: 8,
+              border: '1px solid var(--border)', background: 'var(--surface)',
+              color: 'var(--text)', fontSize: 13, boxSizing: 'border-box',
+            }}
+          />
+          {globalSearch && (
+            <button onClick={() => setGlobalSearch('')} style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text3)',
+            }}>✕</button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Résultats recherche globale ── */}
+      {globalResults && (
+        <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 16 }}>
+          {(['groupes', 'organismes', 'etablissements', 'bassins', 'users'] as const).map(type => {
+            const items = globalResults[type]
+            if (!items.length) return null
+            const labels: Record<string, string> = { groupes: 'Groupes', organismes: 'Organismes', etablissements: 'Établissements', bassins: 'Bassins', users: 'Utilisateurs' }
+            return (
+              <div key={type}>
+                <div style={{ padding: '6px 14px', background: 'var(--surface2)', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {labels[type]} ({items.length})
+                  </span>
+                </div>
+                {(items as any[]).map((item: any) => (
+                  <div key={item.id} style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface)' }}>
+                    <div>
+                      <p style={{ fontWeight: 600, fontSize: 13 }}>{item.nom ?? item.username}</p>
+                      {item.nom && item.username && <p style={{ fontSize: 11, color: 'var(--text3)' }}>{item.nom}</p>}
+                      {type === 'etablissements' && item.organisme && (
+                        <p style={{ fontSize: 11, color: 'var(--text3)' }}>{item.organisme.nom}{item.organisme.groupe ? ` › ${item.organisme.groupe.nom}` : ''}</p>
+                      )}
+                      {type === 'organismes' && item.groupe && (
+                        <p style={{ fontSize: 11, color: 'var(--text3)' }}>{item.groupe.nom}</p>
+                      )}
+                    </div>
+                    {type === 'users' && <Badge label={ROLE_LABEL[item.role] ?? item.role} color={ROLE_COLOR[item.role] ?? '#6b7280'} />}
+                    {type === 'etablissements' && item.abonnement && <Badge label={item.abonnement.statut} color={STATUT_COLOR[item.abonnement.statut] ?? '#6b7280'} />}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
+          {Object.values(globalResults).every(arr => arr.length === 0) && (
+            <p style={{ padding: '20px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>Aucun résultat pour "{globalSearch}"</p>
+          )}
+        </div>
+      )}
+
       {/* ── Titre + fil d'ariane ── */}
       <div style={{ marginBottom: 16 }}>
-        <h3 style={{ fontWeight: 700, fontSize: 16, marginBottom: 10 }}>Vue hiérarchique</h3>
+        <h3 style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: 'var(--text2)' }}>Navigation</h3>
 
         {/* Fil d'ariane cliquable */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
