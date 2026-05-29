@@ -149,7 +149,7 @@ export default function HierarchieManager() {
       {/* ── Titre ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
         <Icon name="people" size={16} color="#00aeef" />
-        <h3 style={{ fontWeight: 700, fontSize: 16 }}>Vue hiérarchique — Qui a quoi</h3>
+        <h3 style={{ fontWeight: 700, fontSize: 16 }}>Vue hiérarchique</h3>
         <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text3)' }}>
           {data.groupes.length} groupe(s) · {data.organismes.length} organisme(s) · {data.etablissements.length} étab(s) · {data.users.length} user(s)
         </span>
@@ -158,7 +158,7 @@ export default function HierarchieManager() {
       {/* ── Filtres ── */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16, padding: '12px 14px', background: 'var(--surface2)', borderRadius: 10, border: '1px solid var(--border)' }}>
         <input
-          placeholder="🔍 Rechercher…"
+          placeholder="Rechercher…"
           value={search} onChange={e => setSearch(e.target.value)}
           style={{ ...inp, minWidth: 180, flex: 1 }}
         />
@@ -181,7 +181,7 @@ export default function HierarchieManager() {
 
       {/* ── Onglets ── */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-        {([['arbre', '🌳 Vue arbre'], ['etabs', '🏊 Établissements'], ['users', '👤 Utilisateurs']] as const).map(([key, label]) => (
+        {([['arbre', 'Vue arbre'], ['etabs', 'Établissements'], ['users', 'Utilisateurs']] as const).map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)} style={{
             padding: '7px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: tab === key ? 700 : 400,
             background: tab === key ? '#00aeef22' : 'var(--surface2)',
@@ -388,14 +388,14 @@ function OrgHeader({ org, etabs, users, isOpen, toggle }: { org: Organisme; etab
 function EtabRow({ e, users, indent }: { e: Etablissement; users?: UserRow[]; indent?: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', borderTop: '1px solid var(--border)', flexWrap: 'wrap', marginLeft: indent ? 16 : 0, borderLeft: indent ? '2px solid #00aeef33' : undefined }}>
-      <span style={{ fontSize: 13 }}>🏊</span>
+      <span style={{ fontSize: 13, color: 'var(--text3)' }}>—</span>
       <div style={{ flex: 1, minWidth: 120 }}>
         <span style={{ fontWeight: 600, fontSize: 13 }}>{e.nom}</span>
         {e.adresse && <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 6 }}>{e.adresse}</span>}
       </div>
       {e.abonnement && <><Badge label={e.abonnement.plan} color="#9333ea" /><Badge label={e.abonnement.statut} color={STATUT_COLOR[e.abonnement.statut] ?? '#6b7280'} /></>}
       <span style={{ fontSize: 11, color: 'var(--text3)' }}>
-        👤{e._count.users} · 🏊{e._count.bassins} · 📊{e._count.releves}
+        {e._count.users} user(s) · {e._count.bassins} bassin(s) · {e._count.releves} relevé(s)
       </span>
       {users && users.map(u => (
         <Badge key={u.id} label={`${u.username} (${ROLE_LABEL[u.role] ?? u.role})`} color={ROLE_COLOR[u.role] ?? '#6b7280'} />
