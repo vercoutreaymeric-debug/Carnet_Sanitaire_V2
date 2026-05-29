@@ -62,6 +62,7 @@ export default function HierarchieManager() {
   const [selGroupe, setSelGroupe]   = useState<Groupe | null>(null)
   const [selOrg, setSelOrg]         = useState<Organisme | null>(null)
   const [selEtab, setSelEtab]       = useState<Etablissement | null>(null)
+  const [search, setSearch]         = useState('')
 
   useEffect(() => {
     fetch('/api/superadmin/hierarchie')
@@ -70,18 +71,20 @@ export default function HierarchieManager() {
       .catch(() => setLoading(false))
   }, [])
 
-  function goToGroupes() { setLevel('groupes'); setSelGroupe(null); setSelOrg(null); setSelEtab(null) }
-  function goToOrganismes(g: Groupe) { setLevel('organismes'); setSelGroupe(g); setSelOrg(null); setSelEtab(null) }
-  function goToEtablissements(o: Organisme) { setLevel('etablissements'); setSelOrg(o); setSelEtab(null) }
-  function goToBassins(e: Etablissement) { setLevel('bassins'); setSelEtab(e) }
+  function goToGroupes() { setLevel('groupes'); setSelGroupe(null); setSelOrg(null); setSelEtab(null); setSearch('') }
+  function goToOrganismes(g: Groupe) { setLevel('organismes'); setSelGroupe(g); setSelOrg(null); setSelEtab(null); setSearch('') }
+  function goToEtablissements(o: Organisme) { setLevel('etablissements'); setSelOrg(o); setSelEtab(null); setSearch('') }
+  function goToBassins(e: Etablissement) { setLevel('bassins'); setSelEtab(e); setSearch('') }
 
   if (loading) return <Card><p style={{ color: 'var(--text3)', fontSize: 13 }}>Chargement…</p></Card>
   if (!data)   return <Card><p style={{ color: '#ef4444', fontSize: 13 }}>Erreur de chargement.</p></Card>
 
-  // Données filtrées selon le niveau
-  const organismes    = data.organismes.filter(o => !selGroupe || o.groupeId === selGroupe.id)
-  const etablissements = data.etablissements.filter(e => !selOrg || e.organismeId === selOrg.id)
-  const bassins       = data.bassins.filter(b => !selEtab || b.etablissementId === selEtab.id)
+  // Données filtrées selon le niveau + recherche
+  const q = search.toLowerCase()
+  const organismes     = data.organismes.filter(o => (!selGroupe || o.groupeId === selGroupe.id) && (!q || o.nom.toLowerCase().includes(q)))
+  const etablissements = data.etablissements.filter(e => (!selOrg || e.organismeId === selOrg.id) && (!q || e.nom.toLowerCase().includes(q)))
+  const bassins        = data.bassins.filter(b => (!selEtab || b.etablissementId === selEtab.id) && (!q || b.nom.toLowerCase().includes(q)))
+  const groupes        = data.groupes.filter(g => !q || g.nom.toLowerCase().includes(q))
   const usersEtab     = selEtab ? data.users.filter(u => u.etablissementId === selEtab.id) : []
 
   const row = (onClick?: () => void) => ({
@@ -121,7 +124,7 @@ export default function HierarchieManager() {
         {(['groupes', 'organismes', 'etablissements', 'bassins'] as Level[]).map(l => {
           const labels: Record<Level, string> = { groupes: 'Groupes', organismes: 'Organismes', etablissements: 'Établissements', bassins: 'Bassins' }
           const counts: Record<Level, number> = {
-            groupes: data.groupes.length,
+            groupes: groupes.length,
             organismes: organismes.length,
             etablissements: etablissements.length,
             bassins: bassins.length,
@@ -142,14 +145,34 @@ export default function HierarchieManager() {
         })}
       </div>
 
+      {/* ── Barre de recherche ── */}
+      <div style={{ position: 'relative', marginBottom: 12 }}>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Rechercher…"
+          style={{
+            width: '100%', padding: '8px 36px 8px 12px', borderRadius: 8,
+            border: '1px solid var(--border)', background: 'var(--surface)',
+            color: 'var(--text)', fontSize: 13, boxSizing: 'border-box',
+          }}
+        />
+        {search && (
+          <button onClick={() => setSearch('')} style={{
+            position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+            background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: 'var(--text3)',
+          }}>✕</button>
+        )}
+      </div>
+
       {/* ── Contenu ── */}
       <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
 
         {/* GROUPES */}
         {level === 'groupes' && (
-          data.groupes.length === 0
+          groupes.length === 0
             ? <Empty msg="Aucun groupe." />
-            : data.groupes.map(g => (
+            : groupes.map(g => (
               <div key={g.id} onClick={() => goToOrganismes(g)}
                 style={row(goToOrganismes)}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
