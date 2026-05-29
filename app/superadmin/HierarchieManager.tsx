@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
 import Card from '@/components/Card'
-import Icon from '@/components/Icon'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Groupe    { id: number; nom: string; _count: { organismes: number; users: number } }
@@ -148,7 +147,6 @@ export default function HierarchieManager() {
     <Card>
       {/* ── Titre ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <Icon name="people" size={16} color="#00aeef" />
         <h3 style={{ fontWeight: 700, fontSize: 16 }}>Vue hiérarchique</h3>
         <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text3)' }}>
           {data.groupes.length} groupe(s) · {data.organismes.length} organisme(s) · {data.etablissements.length} étab(s) · {data.users.length} user(s)
@@ -206,7 +204,6 @@ export default function HierarchieManager() {
             return (
               <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                 <div style={{ background: 'var(--surface2)', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 14 }}>🏊</span>
                   <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text2)' }}>Sans organisme ({sans.length} étab{sans.length > 1 ? 's' : ''})</span>
                 </div>
                 {sans.map(e => <EtabRow key={e.id} e={e} />)}
@@ -245,9 +242,7 @@ export default function HierarchieManager() {
                   {/* Header groupe */}
                   <div onClick={() => setOpenGroupes(s => { const n = new Set(s); isOpen ? n.delete(grp.id) : n.add(grp.id); return n })}
                     style={{ background: '#0097A711', padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 16 }}>{isOpen ? '▾' : '▸'}</span>
-                    <Icon name="building" size={16} color="#0097A7" />
-                    <span style={{ fontWeight: 800, fontSize: 14, color: '#0097A7' }}>{grp.nom}</span>
+                    <span style={{ fontWeight: 800, fontSize: 14, color: '#0097A7' }}>{isOpen ? '▾' : '▸'} {grp.nom}</span>
                     <span style={{ fontSize: 12, color: 'var(--text3)', marginLeft: 4 }}>
                       {grp._count.organismes} organisme(s) · {data.users.filter(u => u.groupeId === grp.id).length} resp.
                     </span>
@@ -299,7 +294,7 @@ export default function HierarchieManager() {
                 </div>
                 <div>
                   <p style={{ fontSize: 12 }}>{e.organisme?.nom ?? <span style={{ color: 'var(--text3)' }}>—</span>}</p>
-                  {e.organisme?.groupe && <p style={{ fontSize: 11, color: '#0097A7' }}>↳ {e.organisme.groupe.nom}</p>}
+                  {e.organisme?.groupe && <p style={{ fontSize: 11, color: '#0097A7' }}>{e.organisme.groupe.nom}</p>}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   {e.abonnement ? <>
@@ -376,8 +371,7 @@ export default function HierarchieManager() {
 function OrgHeader({ org, etabs, users, isOpen, toggle }: { org: Organisme; etabs: Etablissement[]; users: UserRow[]; isOpen: boolean; toggle: () => void }) {
   return (
     <div onClick={toggle} style={{ background: '#00aeef11', padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 14 }}>{isOpen ? '▾' : '▸'}</span>
-      <span style={{ fontWeight: 700, fontSize: 13, color: '#00aeef' }}>{org.nom}</span>
+      <span style={{ fontWeight: 700, fontSize: 13, color: '#00aeef' }}>{isOpen ? '▾' : '▸'} {org.nom}</span>
       <span style={{ fontSize: 11, color: 'var(--text3)', background: 'var(--surface2)', padding: '1px 7px', borderRadius: 10 }}>{org.type}</span>
       <span style={{ fontSize: 12, color: 'var(--text3)' }}>{etabs.length} étab{etabs.length > 1 ? 's' : ''}</span>
       {users.map(u => <Badge key={u.id} label={u.username} color="#00aeef" />)}
@@ -388,7 +382,7 @@ function OrgHeader({ org, etabs, users, isOpen, toggle }: { org: Organisme; etab
 function EtabRow({ e, users, indent }: { e: Etablissement; users?: UserRow[]; indent?: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', borderTop: '1px solid var(--border)', flexWrap: 'wrap', marginLeft: indent ? 16 : 0, borderLeft: indent ? '2px solid #00aeef33' : undefined }}>
-      <span style={{ fontSize: 13, color: 'var(--text3)' }}>—</span>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00aeef', flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 120 }}>
         <span style={{ fontWeight: 600, fontSize: 13 }}>{e.nom}</span>
         {e.adresse && <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 6 }}>{e.adresse}</span>}
