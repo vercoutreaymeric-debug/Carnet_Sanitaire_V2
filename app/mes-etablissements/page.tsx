@@ -24,6 +24,7 @@ export default async function MesEtablissementsPage() {
         where,
         orderBy: { createdAt: 'desc' },
         include: {
+          groupe: { select: { id: true, nom: true } },
           etablissements: {
             include: {
               abonnement: true,

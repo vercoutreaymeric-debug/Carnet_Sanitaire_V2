@@ -15,6 +15,7 @@ interface OrgUser { id: number; username: string; nom: string; email: string }
 interface Organisme {
   id: number; nom: string; type: string; adresse: string; telephone: string
   etablissements: Etab[]; users: OrgUser[]
+  groupe: { id: number; nom: string } | null
   _count: { etablissements: number }
 }
 interface Groupe { id: number; nom: string }
@@ -234,11 +235,15 @@ export default function GroupeView({ groupe, organismes: initOrgs, groupeId }: {
               label={org.nom}
               sublabel={[
                 org.type,
+                !groupe && org.groupe ? `Groupe : ${org.groupe.nom}` : null,
                 org.adresse || null,
                 org.telephone || null,
                 org.users[0] ? `Resp : ${org.users[0].nom || org.users[0].username}` : null,
               ].filter(Boolean).join(' · ')}
-              tags={[{ text: `${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.25)' }]}
+              tags={[
+                !groupe && org.groupe ? { text: org.groupe.nom, bg: 'rgba(0,151,167,0.6)' } : null,
+                { text: `${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.25)' },
+              ].filter(Boolean) as { text: string; bg: string }[]}
               color={C_ORG}
               indent={INDENT}
               addButton={<ActionBtn onClick={() => setCreateEtabOrgId(org.id)} label="+ Étab" />}
