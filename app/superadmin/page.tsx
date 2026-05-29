@@ -3,6 +3,7 @@ import Card from '@/components/Card'
 import Icon from '@/components/Icon'
 import CredentialsForm from './CredentialsForm'
 import EtablissementsManager from './EtablissementsManager'
+import HierarchieManager from './HierarchieManager'
 export const dynamic = 'force-dynamic'
 
 export default async function SuperAdminPage() {
@@ -54,6 +55,9 @@ export default async function SuperAdminPage() {
 
       {/* Gestionnaire établissements */}
       <EtablissementsManager etablissements={etablissements} />
+
+      {/* Vue hiérarchique filtrable */}
+      <HierarchieManager />
 
       {/* Identifiants superadmin */}
       <Card>
