@@ -31,6 +31,7 @@ export default function Sidebar({ open, onClose, alertCount = 0 }: SidebarProps)
     { href: '/contacts',      key: 'contacts',     icon: 'phone' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
     { href: '/statistiques',  key: 'statistiques', icon: 'chart' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'visualisateur', 'controleur_ars'] },
     { href: '/historique',    key: 'historique',   icon: 'calendar' as const, roles: ['superadmin', 'admin', 'responsable_etablissement', 'controleur_ars'] },
+    { href: '/export-pdf',    key: 'export_pdf',   icon: 'download' as const, roles: ['superadmin', 'admin', 'responsable_etablissement', 'controleur_ars'] },
     { href: '/etablissement', key: 'etablissement',icon: 'building' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement'] },
     { href: '/abonnement',    key: 'abonnement',   icon: 'creditCard' as const, roles: ['superadmin', 'admin', 'responsable_etablissement'] },
   ]

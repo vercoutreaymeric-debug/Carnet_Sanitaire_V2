@@ -13,6 +13,7 @@ export const T = {
     statistiques:   { fr: 'Statistiques',           en: 'Statistics' },
     historique:     { fr: 'Historique',             en: 'History' },
     abonnement:     { fr: 'Abonnement',             en: 'Subscription' },
+    export_pdf:     { fr: 'Export PDF',              en: 'PDF Export' },
     settings:       { fr: 'Paramètres',             en: 'Settings' },
   },
   common: {
