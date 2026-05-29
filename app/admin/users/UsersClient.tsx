@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/roles'
 import type { Role } from '@/lib/roles'
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal'
 
 interface User { id: number; username: string; role: string; nom: string; email: string; createdAt: string }
 
@@ -17,25 +18,35 @@ const roleLabels: Record<string, string> = Object.fromEntries(
 // Rôles créables selon son propre rôle
 const CREATABLE_ROLES: Record<string, { value: string; label: string }[]> = {
   superadmin: [
-    { value: 'admin', label: 'Admin' },
+    { value: 'responsable_groupe',        label: 'Responsable de Groupe' },
+    { value: 'responsable_organisme',     label: "Responsable d'Organisme" },
     { value: 'responsable_etablissement', label: "Responsable d'Établissement" },
-    { value: 'responsable_saisie', label: 'Responsable de Saisie' },
-    { value: 'visualisateur', label: 'Auditeur' },
-    { value: 'controleur_ars', label: 'Contrôleur ARS' },
+    { value: 'responsable_saisie',        label: 'Responsable de Saisie' },
+    { value: 'visualisateur',             label: 'Auditeur' },
+    { value: 'controleur_ars',            label: 'Contrôleur ARS' },
   ],
-  admin: [
+  responsable_groupe: [
+    { value: 'responsable_organisme',     label: "Responsable d'Organisme" },
     { value: 'responsable_etablissement', label: "Responsable d'Établissement" },
-    { value: 'responsable_saisie', label: 'Responsable de Saisie' },
-    { value: 'visualisateur', label: 'Auditeur' },
-    { value: 'controleur_ars', label: 'Contrôleur ARS' },
+    { value: 'responsable_saisie',        label: 'Responsable de Saisie' },
+    { value: 'visualisateur',             label: 'Auditeur' },
+    { value: 'controleur_ars',            label: 'Contrôleur ARS' },
+  ],
+  responsable_organisme: [
+    { value: 'responsable_etablissement', label: "Responsable d'Établissement" },
+    { value: 'responsable_saisie',        label: 'Responsable de Saisie' },
+    { value: 'visualisateur',             label: 'Auditeur' },
+    { value: 'controleur_ars',            label: 'Contrôleur ARS' },
   ],
   responsable_etablissement: [
-    { value: 'responsable_saisie', label: 'Responsable de Saisie' },
-    { value: 'visualisateur', label: 'Auditeur' },
+    { value: 'responsable_saisie',        label: 'Responsable de Saisie' },
+    { value: 'visualisateur',             label: 'Auditeur' },
   ],
 }
 
-const emptyForm = { username: '', password: '', nom: '', email: '', role: 'responsable_saisie' }
+const emptyForm = { username: '', password: '', confirmPassword: '', nom: '', email: '', role: 'responsable_saisie' }
+
+const ROLE_ORDER = ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars']
 
 export default function UsersClient() {
   const { user: me } = useAuth()
@@ -46,17 +57,29 @@ export default function UsersClient() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [editId, setEditId] = useState<number | null>(null)
-  const [editForm, setEditForm] = useState({ nom: '', email: '', role: 'responsable_saisie', password: '' })
+  const [editForm, setEditForm] = useState({ nom: '', email: '', role: 'responsable_saisie', password: '', confirmPassword: '' })
+  const [filterRole, setFilterRole] = useState<string>('')
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<User | null>(null)
 
   async function load() {
     const res = await fetch('/api/users')
-    if (res.ok) setUsers(await res.json())
+    if (res.ok) {
+      const data = await res.json()
+      // Trier par ordre de rôle
+      data.sort((a: User, b: User) => {
+        const ia = ROLE_ORDER.indexOf(a.role)
+        const ib = ROLE_ORDER.indexOf(b.role)
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
+      })
+      setUsers(data)
+    }
   }
 
   useEffect(() => { load() }, [])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
+    if (form.password !== form.confirmPassword) { setError('Les mots de passe ne correspondent pas.'); return }
     setSaving(true); setError('')
     const res = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     if (res.ok) { setForm({ ...emptyForm }); setShowForm(false); load() }
@@ -64,14 +87,15 @@ export default function UsersClient() {
     setSaving(false)
   }
 
-  async function handleDelete(id: number, username: string) {
-    if (!confirm(`Supprimer l'utilisateur "${username}" ?`)) return
-    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
+  async function handleDelete(user: User) {
+    const res = await fetch(`/api/users/${user.id}`, { method: 'DELETE' })
+    setConfirmDeleteUser(null)
     if (res.ok) load()
-    else { const d = await res.json(); alert(d.error) }
+    else { const d = await res.json(); setError(d.error || 'Erreur lors de la suppression') }
   }
 
   async function handleEdit(id: number) {
+    if (editForm.password && editForm.password !== editForm.confirmPassword) { setError('Les mots de passe ne correspondent pas.'); return }
     setSaving(true); setError('')
     const res = await fetch(`/api/users/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editForm) })
     if (res.ok) { setEditId(null); load() }
@@ -103,14 +127,14 @@ export default function UsersClient() {
         </button>
       </div>
 
-      {/* Rôles expliqués */}
+      {/* Description des rôles — résumé */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
         {[
-          { role: 'admin',                     desc: lang === 'fr' ? 'Accès complet + gestion utilisateurs + sauvegarde' : 'Full access + user management + backup' },
+          { role: 'responsable_organisme',     desc: lang === 'fr' ? 'Gère tous les établissements de son organisme' : 'Manages all establishments of their organisation' },
           { role: 'responsable_etablissement', desc: lang === 'fr' ? 'Modifier, supprimer (hors relevés), gérer utilisateurs' : 'Edit, delete (excl. records), manage users' },
           { role: 'responsable_saisie',        desc: lang === 'fr' ? 'Saisir et modifier les données' : 'Create and edit data' },
           { role: 'visualisateur',             desc: lang === 'fr' ? 'Consultation + statistiques uniquement' : 'Read-only + statistics' },
-          { role: 'controleur_ars',            desc: lang === 'fr' ? 'Accès lecture ARS — voit uniquement les relevés validés' : 'ARS read-only — validated records only' },
+          { role: 'controleur_ars',            desc: lang === 'fr' ? 'Accès lecture ARS — relevés validés uniquement' : 'ARS read-only — validated records only' },
         ].map(r => (
           <div key={r.role} style={{ background: 'var(--surface2)', border: `1px solid ${roleColors[r.role]}44`, borderRadius: 10, padding: '12px 14px' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: roleColors[r.role], display: 'block', marginBottom: 4 }}>
@@ -120,6 +144,54 @@ export default function UsersClient() {
           </div>
         ))}
       </div>
+
+      {/* Compteurs par rôle — cliquer pour filtrer */}
+      {(() => {
+        const rolesPresents = ROLE_ORDER.filter(r => users.some(u => u.role === r))
+        if (rolesPresents.length === 0) return null
+        return (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <button
+              onClick={() => setFilterRole('')}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                border: filterRole === '' ? '2px solid var(--accent)' : '1.5px solid var(--border2)',
+                background: filterRole === '' ? 'var(--accent)18' : 'var(--surface2)',
+                color: filterRole === '' ? 'var(--accent)' : 'var(--text2)',
+              }}
+            >
+              Tous
+              <span style={{ background: 'var(--accent)22', color: 'var(--accent)', borderRadius: 99, padding: '0px 7px', fontSize: 11, fontWeight: 700 }}>
+                {users.length}
+              </span>
+            </button>
+            {rolesPresents.map(r => {
+              const count = users.filter(u => u.role === r).length
+              const c = roleColors[r] ?? '#6b7280'
+              const active = filterRole === r
+              return (
+                <button
+                  key={r}
+                  onClick={() => setFilterRole(active ? '' : r)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    border: active ? `2px solid ${c}` : `1.5px solid ${c}44`,
+                    background: active ? `${c}18` : 'var(--surface2)',
+                    color: active ? c : 'var(--text2)',
+                  }}
+                >
+                  {roleLabels[r] ?? r}
+                  <span style={{ background: `${c}22`, color: c, borderRadius: 99, padding: '0px 7px', fontSize: 11, fontWeight: 700 }}>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       {/* Formulaire création */}
       {showForm && (
@@ -144,6 +216,10 @@ export default function UsersClient() {
               <div>
                 <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Mot de passe *</label>
                 <input style={inputStyle} type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required placeholder="••••••••" />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Confirmation mot de passe *</label>
+                <input style={{ ...inputStyle, borderColor: form.confirmPassword && form.confirmPassword !== form.password ? '#dc2626' : undefined }} type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))} required placeholder="••••••••" />
               </div>
               <div>
                 <label style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Rôle *</label>
@@ -182,7 +258,7 @@ export default function UsersClient() {
             </tr>
           </thead>
           <tbody>
-            {users.map(u => (
+            {users.filter(u => !filterRole || u.role === filterRole).map(u => (
               <tr key={u.id}>
                 <td style={{ fontWeight: 600, fontFamily: 'DM Mono', fontSize: 13 }}>
                   {u.username}
@@ -219,7 +295,10 @@ export default function UsersClient() {
                 </td>
                 <td>
                   {editId === u.id ? (
-                    <input style={{ ...inputStyle, padding: '4px 8px' }} type="password" value={editForm.password} onChange={e => setEditForm(f => ({ ...f, password: e.target.value }))} placeholder="Nouveau mdp (laisser vide = inchangé)" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <input style={{ ...inputStyle, padding: '4px 8px' }} type="password" value={editForm.password} onChange={e => setEditForm(f => ({ ...f, password: e.target.value }))} placeholder="Nouveau mdp (laisser vide = inchangé)" />
+                      <input style={{ ...inputStyle, padding: '4px 8px', borderColor: editForm.confirmPassword && editForm.confirmPassword !== editForm.password ? '#dc2626' : undefined }} type="password" value={editForm.confirmPassword} onChange={e => setEditForm(f => ({ ...f, confirmPassword: e.target.value }))} placeholder="Confirmation mdp" />
+                    </div>
                   ) : (
                     <span style={{ color: 'var(--text3)', fontSize: 12 }}>••••••••</span>
                   )}
@@ -240,11 +319,11 @@ export default function UsersClient() {
                       </>
                     ) : (
                       <>
-                        <button onClick={() => { setEditId(u.id); setEditForm({ nom: u.nom, email: u.email || '', role: u.role, password: '' }) }} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 4 }} title="Modifier">
+                        <button onClick={() => { setEditId(u.id); setEditForm({ nom: u.nom, email: u.email || '', role: u.role, password: '', confirmPassword: '' }) }} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 4 }} title="Modifier">
                           <Icon name="edit" size={15} />
                         </button>
                         {u.username !== me?.username && (
-                          <button onClick={() => handleDelete(u.id, u.username)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', padding: 4 }} title="Supprimer">
+                          <button onClick={() => setConfirmDeleteUser(u)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', padding: 4 }} title="Supprimer">
                             <Icon name="trash" size={15} />
                           </button>
                         )}
@@ -254,9 +333,32 @@ export default function UsersClient() {
                 </td>
               </tr>
             ))}
+            {users.filter(u => !filterRole || u.role === filterRole).length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ padding: 40, textAlign: 'center', color: 'var(--text3)' }}>
+                  {filterRole ? `Aucun utilisateur avec le rôle "${roleLabels[filterRole] ?? filterRole}"` : 'Aucun utilisateur'}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Card>
+
+      {/* Modal confirmation suppression utilisateur */}
+      {confirmDeleteUser && (
+        <ConfirmDeleteModal
+          nom={confirmDeleteUser.nom || confirmDeleteUser.username}
+          type="Utilisateur"
+          danger={me?.role === 'superadmin' ? 2 : 1}
+          details={[
+            `Identifiant : ${confirmDeleteUser.username}`,
+            `Rôle : ${roleLabels[confirmDeleteUser.role] ?? confirmDeleteUser.role}`,
+            'Toutes ses données de session seront perdues',
+          ]}
+          onConfirm={() => handleDelete(confirmDeleteUser)}
+          onCancel={() => setConfirmDeleteUser(null)}
+        />
+      )}
     </div>
   )
 }

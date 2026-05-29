@@ -18,7 +18,7 @@ function getRole(): string | null {
 
 export async function POST() {
   const role = getRole()
-  if (!['superadmin', 'admin'].includes(role ?? '')) {
+  if (!['superadmin', 'responsable_organisme'].includes(role ?? '')) {
     return NextResponse.json({ error: 'Accès réservé aux administrateurs' }, { status: 403 })
   }
   try {

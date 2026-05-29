@@ -7,7 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 export default function ConditionalShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  const bare = pathname === '/login' || pathname.startsWith('/preview')
+  const bare = pathname === '/login' || pathname.startsWith('/preview') || pathname.startsWith('/inscription')
 
   if (bare) return <LangProvider><AuthProvider>{children}</AuthProvider></LangProvider>
 

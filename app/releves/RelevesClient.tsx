@@ -331,7 +331,7 @@ export default function RelevesClient({ initialReleves, initialBassins }: Props)
           {/* ── Notice critères de conformité ─────────────────────────── */}
           <details style={{ marginTop: 8 }}>
             <summary style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer', userSelect: 'none', fontWeight: 500 }}>
-              ℹ️ Critères de conformité (Arrêté du 7 avril 1981)
+              Critères de conformité (Arrêté du 7 avril 1981)
             </summary>
             <div style={{ background: 'var(--surface3)', borderRadius: 8, padding: '10px 14px', marginTop: 6, fontSize: 12, color: 'var(--text2)' }}>
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>

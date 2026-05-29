@@ -44,6 +44,21 @@ function fmt(d: Date | string) {
 }
 
 function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const illimite = max >= 999
+  if (illimite) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text2)' }}>
+          <span>{value} utilisés</span>
+          <span style={{ fontWeight: 700, color, fontSize: 16 }}>∞</span>
+        </div>
+        <div style={{ height: 8, background: `${color}30`, borderRadius: 99, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: '100%', background: `linear-gradient(90deg, ${color}66, ${color})`, borderRadius: 99 }} />
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text3)' }}>Illimité</div>
+      </div>
+    )
+  }
   const pct = max <= 0 ? 0 : Math.min(100, Math.round((value / max) * 100))
   const danger = pct >= 90
   return (

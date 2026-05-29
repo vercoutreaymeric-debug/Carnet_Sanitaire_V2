@@ -7,8 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Groupe (holding — regroupe plusieurs organismes) ─────────────────────────
+model Groupe {
+  id        Int         @id @default(autoincrement())
+  nom       String
+  createdAt DateTime    @default(now())
+  organismes Organisme[]
+  users     User[]
+}
+
+// ── Organisme (société / association / collectivité) ──────────────────────────
+model Organisme {
+  id             Int             @id @default(autoincrement())
+  nom            String
+  type           String          @default("société")   // société | association | collectivité
+  adresse        String          @default("")
+  telephone      String          @default("")
+  createdAt      DateTime        @default(now())
+
+  // Groupe (optionnel)
+  groupeId       Int?
+  groupe         Groupe?         @relation(fields: [groupeId], references: [id], onDelete: SetNull)
+
+  etablissements Etablissement[]
+  users          User[]
+}
+
+// ── Établissement (site physique, appartient à un Organisme) ─────────────────
 model Etablissement {
-  id                        Int      @id @default(1)
+  id                        Int      @id @default(autoincrement())
   nom                       String
   adresse                   String   @default("")
   telephone                 String   @default("")
@@ -16,15 +43,67 @@ model Etablissement {
   capaciteVisiteursCouvert  Int      @default(0)
   capaciteBaigneursPleinAir Int      @default(0)
   capaciteVisiteursPleinAir Int      @default(0)
+  createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
+
+  // Organisme (optionnel)
+  organismeId    Int?
+  organisme      Organisme?      @relation(fields: [organismeId], references: [id], onDelete: SetNull)
+
+  // Relations
+  abonnement     Abonnement?
+  users          User[]
+  bassins        Bassin[]
+  releves        Releve[]
+  traitements    Traitement[]
+  frequentations Frequentation[]
+  interventions  Intervention[]
+  contacts       Contact[]
+  auditLogs      AuditLog[]
+  piecesJointes  PieceJointe[]
 }
 
+// ── Abonnement (1 par établissement, géré par CIFEC superadmin) ───────────────
+model Abonnement {
+  id              Int           @id @default(autoincrement())
+  etablissementId Int           @unique
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  plan            String        @default("Starter")   // Starter | Pro | Intégral | Sur-mesure
+  statut          String        @default("essai")      // actif | essai | suspendu | expiré
+  dateDebut       DateTime      @default(now())
+  dateExpiration  DateTime
+  maxBassins      Int           @default(5)
+  maxUtilisateurs Int           @default(10)
+  notes           String        @default("")
+  updatedAt       DateTime      @updatedAt
+}
+
+// ── Utilisateurs ─────────────────────────────────────────────────────────────
+model User {
+  id              Int            @id @default(autoincrement())
+  username        String         @unique
+  password        String
+  role            String         @default("responsable_saisie")
+  nom             String         @default("")
+  email           String         @default("")
+  etablissementId Int?           // null = superadmin, responsable_groupe ou responsable_organisme
+  etablissement   Etablissement? @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  groupeId        Int?           // pour responsable_groupe
+  groupe          Groupe?        @relation(fields: [groupeId], references: [id], onDelete: SetNull)
+  organismeId     Int?           // pour responsable_organisme
+  organisme       Organisme?     @relation(fields: [organismeId], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+}
+
+// ── Bassins ──────────────────────────────────────────────────────────────────
 model Bassin {
-  id                   Int          @id @default(autoincrement())
+  id                   Int           @id @default(autoincrement())
+  etablissementId      Int
+  etablissement        Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
   nom                  String
-  type                 String       @default("couvert")
-  typeReglementaire    String?      // A | B | C | D (selon arrêté 26/05/21)
-  mineralisationEau    String?      // normale | forte
+  type                 String        @default("couvert")
+  typeReglementaire    String?
+  mineralisationEau    String?
   longueur             Float?
   largeur              Float?
   profMin              Float?
@@ -34,139 +113,138 @@ model Bassin {
   volumeTotal          Float?
   debitReglementaire   Float?
   debitInstallation    Float?
-  traitementPrincipal  String?      // Chlore, Brome, PHMB, Sel/Électrolyse, UV, Minéralisation
-  typeStabilisant      String?      // Magnésium, Sel de mer, Sel minéral, Autre — si Minéralisation
-  typeMesure           String?      // analyseur (réglementaire) | ponctuelle (non réglementaire)
-  pointsPrelevement    String?      // JSON array de noms libres ex: ["Fond", "Surface", "Entrée"]
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+  traitementPrincipal  String?
+  typeStabilisant      String?
+  typeMesure           String?
+  pointsPrelevement    String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
   releves              Releve[]
   traitements          Traitement[]
 }
 
+// ── Relevés journaliers ───────────────────────────────────────────────────────
 model Releve {
-  id             Int      @id @default(autoincrement())
-  date           String
-  bassinId       Int
-  bassin         Bassin   @relation(fields: [bassinId], references: [id], onDelete: Cascade)
-  bassinNom      String
-  heure          String
-  transparence   String   @default("Bonne")
-  tempEau        Float
-  tempAir        Float?
-  ph             Float
-  chloreLibre    Float
-  chloreCombine  Float?
-  chloreTotal    Float?
-  turbidite      Float?
-  redox          Float?   // potentiel d'oxydoréduction (mV) — obligatoire si analyseur
-  cyanurate      Float?   // stabilisant chlore (mg/L) — piscines plein air
-  tauxChlorure   Float?   // chlorure (mg/L) — piscines sel/électrolyse
-  pointPrelevement String?  // point A, B, C...
-  th             Float?
-  tac            Float?
-  chloreActif    Float?   // calculé selon formule réglementaire
-  volumeReactif  Float?
-  debitRecyclage Float?
-  status         String
-  valide         Boolean  @default(false)
-  valideePar     String?  // nom du validateur
-  valideeAt      DateTime?
-  createdAt      DateTime @default(now())
+  id               Int           @id @default(autoincrement())
+  etablissementId  Int
+  etablissement    Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  date             String
+  bassinId         Int
+  bassin           Bassin        @relation(fields: [bassinId], references: [id], onDelete: Cascade)
+  bassinNom        String
+  heure            String
+  transparence     String        @default("Bonne")
+  tempEau          Float
+  tempAir          Float?
+  ph               Float
+  chloreLibre      Float
+  chloreCombine    Float?
+  chloreTotal      Float?
+  turbidite        Float?
+  redox            Float?
+  cyanurate        Float?
+  tauxChlorure     Float?
+  pointPrelevement String?
+  th               Float?
+  tac              Float?
+  chloreActif      Float?
+  volumeReactif    Float?
+  debitRecyclage   Float?
+  status           String
+  valide           Boolean       @default(false)
+  valideePar       String?
+  valideeAt        DateTime?
+  createdAt        DateTime      @default(now())
 }
 
+// ── Traitements ───────────────────────────────────────────────────────────────
+model Traitement {
+  id                    Int           @id @default(autoincrement())
+  etablissementId       Int
+  etablissement         Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  date                  String
+  heure                 String?
+  bassinId              Int
+  bassin                Bassin        @relation(fields: [bassinId], references: [id], onDelete: Cascade)
+  bassinNom             String
+  quantiteStabilisant   Float?
+  uniteStabilisant      String?
+  quantiteDesinfectant  Float?
+  uniteDesinfectant     String?
+  quantiteCorrecteurPh  Float?
+  uniteCorrecteurPh     String?
+  debitRecyclage        Float?
+  notes                 String?
+  createdAt             DateTime      @default(now())
+}
+
+// ── Fréquentation ─────────────────────────────────────────────────────────────
 model Frequentation {
-  id                Int      @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
+  etablissementId   Int
+  etablissement     Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
   date              String
-  scolaire          Int      @default(0)
-  club              Int      @default(0)
-  publicCount       Int      @default(0)
-  autre             Int      @default(0)
-  total             Int      @default(0)
+  scolaire          Int           @default(0)
+  club              Int           @default(0)
+  publicCount       Int           @default(0)
+  autre             Int           @default(0)
+  total             Int           @default(0)
   reportEau         Float?
   releveEau         Float?
   totalEau          Float?
   litresParBaigneur Float?
-  createdAt         DateTime @default(now())
+  createdAt         DateTime      @default(now())
 }
 
+// ── Interventions ─────────────────────────────────────────────────────────────
 model Intervention {
-  id          Int      @id @default(autoincrement())
-  date        String
-  heure       String?
-  type        String
-  bassin      String
-  description String
-  agent       String?
-  status      String   @default("en cours")
-  createdAt   DateTime @default(now())
+  id              Int           @id @default(autoincrement())
+  etablissementId Int
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  date            String
+  heure           String?
+  type            String
+  bassin          String
+  description     String
+  agent           String?
+  status          String        @default("en cours")
+  createdAt       DateTime      @default(now())
 }
 
+// ── Contacts ──────────────────────────────────────────────────────────────────
 model Contact {
-  id          Int     @id @default(autoincrement())
-  categorie   String
-  nom         String
-  adresse     String?
-  responsable String?
-  bureau      String?
-  domicile    String?
+  id              Int           @id @default(autoincrement())
+  etablissementId Int
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  categorie       String
+  nom             String
+  adresse         String?
+  responsable     String?
+  bureau          String?
+  domicile        String?
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String   // SHA-256 hash
-  role      String   @default("responsable_saisie")
-  nom       String   @default("")
-  email     String   @default("")
-  createdAt DateTime @default(now())
-}
-
-model Abonnement {
-  id               Int       @id @default(1)
-  plan             String    @default("Starter")   // Starter | Pro | Intégral | Sur-mesure
-  statut           String    @default("essai")      // actif | essai | suspendu | expiré
-  dateDebut        DateTime  @default(now())
-  dateExpiration   DateTime
-  maxBassins       Int       @default(5)
-  maxUtilisateurs  Int       @default(10)
-  notes            String    @default("")           // note interne CIFEC
-  updatedAt        DateTime  @updatedAt
-}
-
-model Traitement {
-  id                    Int      @id @default(autoincrement())
-  date                  String
-  heure                 String?
-  bassinId              Int
-  bassin                Bassin   @relation(fields: [bassinId], references: [id], onDelete: Cascade)
-  bassinNom             String
-  quantiteStabilisant   Float?
-  uniteStabilisant      String?  // litre | kg | galet
-  quantiteDesinfectant  Float?
-  uniteDesinfectant     String?  // litre | kg | galet
-  quantiteCorrecteurPh  Float?
-  uniteCorrecteurPh     String?  // litre | kg | galet
-  debitRecyclage        Float?
-  notes                 String?
-  createdAt             DateTime @default(now())
-}
-
-model PieceJointe {
-  id        Int      @id @default(autoincrement())
-  module    String   // "releve" | "intervention" | "traitement"
-  moduleId  Int
-  nom       String   // nom original du fichier
-  type      String   // mimetype (image/jpeg, application/pdf…)
-  taille    Int      // taille en octets
-  data      String   // contenu base64 (max ~5 Mo)
-  createdAt DateTime @default(now())
-}
-
+// ── Audit Log ─────────────────────────────────────────────────────────────────
 model AuditLog {
-  id        Int      @id @default(autoincrement())
-  action    String   // CREATE | UPDATE | DELETE | RESTORE
-  module    String   // releve | intervention | bassin | frequentation | contact | backup
-  detail    String
-  createdAt DateTime @default(now())
+  id              Int           @id @default(autoincrement())
+  etablissementId Int
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  action          String        // CREATE | UPDATE | DELETE | RESTORE
+  module          String
+  detail          String
+  createdAt       DateTime      @default(now())
+}
+
+// ── Pièces jointes ────────────────────────────────────────────────────────────
+model PieceJointe {
+  id              Int           @id @default(autoincrement())
+  etablissementId Int
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  module          String
+  moduleId        Int
+  nom             String
+  type            String
+  taille          Int
+  data            String
+  createdAt       DateTime      @default(now())
 }

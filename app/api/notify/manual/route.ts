@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     prisma.user.findMany({
       where: {
         email: { not: '' },
-        role: { in: ['admin', 'responsable_etablissement', 'responsable_saisie'] },
+        role: { in: ['responsable_organisme', 'responsable_etablissement', 'responsable_saisie'] },
       },
       select: { email: true },
     }),

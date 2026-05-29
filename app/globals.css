@@ -30,8 +30,8 @@ body.dark {
   --text: #e6edf3;
   --text2: #7d9db5;
   --text3: #4d6a80;
-  --accent: #00aeef;
-  --accent2: #0099d6;
+  --accent: #0097A7;
+  --accent2: #1A4568;
 }
 
 html, body {
@@ -115,6 +115,10 @@ input, select, textarea, button {
   z-index: 50;
   transition: transform 0.25s ease;
   transform: translateX(-100%);
+}
+
+body.dark .sidebar {
+  background: linear-gradient(180deg, #1A4568 0%, #0d2d45 100%);
 }
 
 .sidebar.open { transform: translateX(0); }

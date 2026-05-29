@@ -8,6 +8,7 @@ export const T = {
     traitements:    { fr: 'Traitements',            en: 'Treatments' },
     interventions:  { fr: 'Interventions',          en: 'Interventions' },
     bassins:        { fr: 'Dossier technique',      en: 'Technical Files' },
+    mes_etablissements: { fr: 'Mes établissements',   en: 'My Establishments' },
     etablissement:  { fr: 'Fiche établissement',    en: 'Establishment' },
     contacts:       { fr: 'Contacts',               en: 'Contacts' },
     statistiques:   { fr: 'Statistiques',           en: 'Statistics' },

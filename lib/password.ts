@@ -20,20 +20,44 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return sha === rawHash
 }
 
-// ── Token de session ─────────────────────────────────────────────────────────
-export function makeSessionToken(username: string, role: string): string {
+// ── Token de session : username|role|secret|etablissementId|groupeId|organismeId ──
+export function makeSessionToken(
+  username: string,
+  role: string,
+  etablissementId?: number | null,
+  groupeId?: number | null,
+  organismeId?: number | null,
+): string {
   const secret = process.env.AUTH_SECRET || 'cs-secret-key'
-  return btoa(`${username}|${role}|${secret}`)
+  const e = etablissementId != null ? `${etablissementId}` : ''
+  const g = groupeId        != null ? `${groupeId}`        : ''
+  const o = organismeId     != null ? `${organismeId}`     : ''
+  return btoa(`${username}|${role}|${secret}|${e}|${g}|${o}`)
 }
 
-export function parseSessionToken(token: string): { username: string; role: string } | null {
+export function parseSessionToken(token: string): {
+  username: string
+  role: string
+  etablissementId: number | null
+  groupeId: number | null
+  organismeId: number | null
+} | null {
   try {
     const decoded = atob(token)
     const parts = decoded.split('|')
     if (parts.length < 3) return null
     const secret = process.env.AUTH_SECRET || 'cs-secret-key'
     if (parts[2] !== secret) return null
-    return { username: parts[0], role: parts[1] }
+    const etabRaw  = parts[3] ? parseInt(parts[3]) : null
+    const groupRaw = parts[4] ? parseInt(parts[4]) : null
+    const orgRaw   = parts[5] ? parseInt(parts[5]) : null
+    return {
+      username: parts[0],
+      role: parts[1],
+      etablissementId: etabRaw  && !isNaN(etabRaw)  ? etabRaw  : null,
+      groupeId:        groupRaw && !isNaN(groupRaw)  ? groupRaw : null,
+      organismeId:     orgRaw   && !isNaN(orgRaw)    ? orgRaw   : null,
+    }
   } catch {
     return null
   }

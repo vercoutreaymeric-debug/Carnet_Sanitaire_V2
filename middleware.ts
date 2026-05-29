@@ -17,7 +17,9 @@ export function middleware(request: NextRequest) {
   // Chemins publics
   if (
     pathname.startsWith('/login') ||
+    pathname.startsWith('/inscription') ||   // Page d'inscription publique
     pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/register') ||  // API inscription publique
     pathname.startsWith('/_next') ||
     pathname.startsWith('/assets') ||
     pathname.startsWith('/public/bassin') ||  // Page publique QR — sans auth
@@ -41,17 +43,25 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // /admin → superadmin + admin + responsable_etablissement
+  // /admin → superadmin + responsable_organisme + responsable_groupe + responsable_etablissement
   if (pathname.startsWith('/admin')) {
-    const allowed = ['superadmin', 'admin', 'responsable_etablissement']
+    const allowed = ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement']
     if (!allowed.includes(role)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
 
-  // /etablissement → admin + responsable_etablissement
+  // /etablissement → responsable_etablissement uniquement (les autres ont /mes-etablissements)
   if (pathname === '/etablissement') {
-    const allowed = ['superadmin', 'admin', 'responsable_etablissement']
+    const allowed = ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement']
+    if (!allowed.includes(role)) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
+  // /mes-etablissements → superadmin + responsable_organisme + responsable_groupe
+  if (pathname.startsWith('/mes-etablissements')) {
+    const allowed = ['superadmin', 'responsable_groupe', 'responsable_organisme']
     if (!allowed.includes(role)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }

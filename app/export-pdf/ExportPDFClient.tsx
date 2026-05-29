@@ -460,12 +460,12 @@ export default function ExportPDFClient() {
   const { du, au } = getDates()
 
   const sectionConfig = [
-    { key: 'releves'      as Section, label: 'Relevés qualité eau',           color: '#00aeef', emoji: '🧪' },
-    { key: 'traitements'  as Section, label: 'Traitements',                    color: '#16a34a', emoji: '🧴' },
-    { key: 'frequentation'as Section, label: 'Fréquentation + compteurs eau',  color: '#d97706', emoji: '👥' },
-    { key: 'interventions'as Section, label: 'Interventions / maintenance',    color: '#dc2626', emoji: '🔧' },
-    { key: 'bassins'      as Section, label: 'Dossier technique des bassins',  color: '#1e3a8a', emoji: '🏊' },
-    { key: 'audit'        as Section, label: 'Journal d\'audit (traçabilité)', color: '#37306b', emoji: '📋' },
+    { key: 'releves'      as Section, label: 'Relevés qualité eau',           color: '#00aeef' },
+    { key: 'traitements'  as Section, label: 'Traitements',                    color: '#16a34a' },
+    { key: 'frequentation'as Section, label: 'Fréquentation + compteurs eau',  color: '#d97706' },
+    { key: 'interventions'as Section, label: 'Interventions / maintenance',    color: '#dc2626' },
+    { key: 'bassins'      as Section, label: 'Dossier technique des bassins',  color: '#1e3a8a' },
+    { key: 'audit'        as Section, label: "Journal d'audit (traçabilité)",  color: '#37306b' },
   ]
 
   return (
@@ -474,7 +474,7 @@ export default function ExportPDFClient() {
       {/* En-tête */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0e4f6e', margin: 0 }}>
-          📄 Export PDF — Carnet Sanitaire
+          Export PDF — Carnet Sanitaire
         </h1>
         <p style={{ fontSize: 13, color: '#6b7280', marginTop: 6 }}>
           Génère un rapport officiel conforme à l'arrêté du 26 mai 2021, prêt pour un contrôle ARS.
@@ -483,7 +483,7 @@ export default function ExportPDFClient() {
 
       {/* Choix de la période */}
       <Card style={{ marginBottom: 16 }}>
-        <h2 style={{ fontSize: 14, fontWeight: 600, color: '#0e4f6e', marginBottom: 14 }}>📅 Période</h2>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: '#0e4f6e', marginBottom: 14 }}>Période</h2>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           {([['mois', 'Mois'], ['trimestre', 'Trimestre'], ['annee', 'Année'], ['perso', 'Personnalisé']] as [Periode, string][]).map(([k, l]) => (
@@ -532,19 +532,19 @@ export default function ExportPDFClient() {
         )}
 
         <div style={{ marginTop: 12, fontSize: 12, color: '#6b7280', background: '#f8fafc', borderRadius: 6, padding: '6px 10px', display: 'inline-block' }}>
-          📆 Période sélectionnée : <strong>{fmt(du)}</strong> → <strong>{fmt(au)}</strong>
+          Période sélectionnée : <strong>{fmt(du)}</strong> → <strong>{fmt(au)}</strong>
         </div>
       </Card>
 
       {/* Sections à inclure */}
       <Card style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 14, fontWeight: 600, color: '#0e4f6e', marginBottom: 14 }}>📋 Sections à inclure</h2>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: '#0e4f6e', marginBottom: 14 }}>Sections à inclure</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {sectionConfig.map(s => (
             <label key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${sections.includes(s.key) ? s.color : '#e5e7eb'}`, background: sections.includes(s.key) ? `${s.color}10` : '#fafafa', transition: 'all 0.15s' }}>
               <input type="checkbox" checked={sections.includes(s.key)} onChange={() => toggleSection(s.key)}
                 style={{ width: 16, height: 16, accentColor: s.color, cursor: 'pointer' }} />
-              <span style={{ fontSize: 18 }}>{s.emoji}</span>
+              <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
               <span style={{ fontSize: 14, fontWeight: 500, color: '#1f2937' }}>{s.label}</span>
             </label>
           ))}
@@ -563,11 +563,7 @@ export default function ExportPDFClient() {
           transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
         }}
       >
-        {loading ? (
-          <>⏳ Génération du PDF…</>
-        ) : (
-          <>📥 Télécharger le PDF officiel</>
-        )}
+        {loading ? 'Génération du PDF…' : 'Télécharger le PDF officiel'}
       </button>
 
       {/* Confirmation après génération */}
@@ -577,16 +573,16 @@ export default function ExportPDFClient() {
             ✅ PDF généré et téléchargé !
           </div>
           <div style={{ fontSize: 13, color: '#166534', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span>📍 Établissement : <strong>{preview.etablissement}</strong></span>
-            <span>📆 Période : <strong>{fmt(preview.du)} → {fmt(preview.au)}</strong></span>
-            <span>🧪 {preview.nb.releves} relevés  •  🧴 {preview.nb.traitements} traitements  •  👥 {preview.nb.frequentation} jours de fréquentation  •  🔧 {preview.nb.interventions} interventions</span>
+            <span>Établissement : <strong>{preview.etablissement}</strong></span>
+            <span>Période : <strong>{fmt(preview.du)} → {fmt(preview.au)}</strong></span>
+            <span>{preview.nb.releves} relevés · {preview.nb.traitements} traitements · {preview.nb.frequentation} jours de fréquentation · {preview.nb.interventions} interventions</span>
           </div>
         </div>
       )}
 
       {/* Mention réglementaire */}
       <div style={{ marginTop: 24, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', fontSize: 12, color: '#1e40af' }}>
-        <strong>ℹ️ Conformité réglementaire</strong><br />
+        <strong>Conformité réglementaire</strong><br />
         Ce PDF inclut toutes les données requises par l'arrêté du 26 mai 2021 et l'article D1332-10 du Code de la santé publique. Il peut être présenté lors d'un contrôle de l'ARS. La conservation minimale obligatoire est de 3 ans (année en cours + 2 années précédentes).
       </div>
     </div>

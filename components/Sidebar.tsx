@@ -22,18 +22,19 @@ export default function Sidebar({ open, onClose, alertCount = 0 }: SidebarProps)
 
   // Visibilité des onglets par rôle
   const allNavItems = [
-    { href: '/dashboard',     key: 'dashboard',    icon: 'dashboard' as const, roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
-    { href: '/releves',       key: 'releves',      icon: 'water' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
-    { href: '/frequentation', key: 'frequentation',icon: 'people' as const,   roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
-    { href: '/interventions', key: 'interventions', icon: 'wrench' as const,  roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
-    { href: '/traitements',   key: 'traitements',  icon: 'flask' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
-    { href: '/bassins',       key: 'bassins',      icon: 'pool' as const,     roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
-    { href: '/contacts',      key: 'contacts',     icon: 'phone' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
-    { href: '/statistiques',  key: 'statistiques', icon: 'chart' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement', 'visualisateur', 'controleur_ars'] },
-    { href: '/historique',    key: 'historique',   icon: 'calendar' as const, roles: ['superadmin', 'admin', 'responsable_etablissement', 'controleur_ars'] },
-    { href: '/export-pdf',    key: 'export_pdf',   icon: 'download' as const, roles: ['superadmin', 'admin', 'responsable_etablissement', 'controleur_ars'] },
-    { href: '/etablissement', key: 'etablissement',icon: 'building' as const,    roles: ['superadmin', 'admin', 'responsable_etablissement'] },
-    { href: '/abonnement',    key: 'abonnement',   icon: 'creditCard' as const, roles: ['superadmin', 'admin', 'responsable_etablissement'] },
+    { href: '/dashboard',     key: 'dashboard',    icon: 'dashboard' as const, roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
+    { href: '/releves',       key: 'releves',      icon: 'water' as const,    roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
+    { href: '/frequentation', key: 'frequentation',icon: 'people' as const,   roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
+    { href: '/interventions', key: 'interventions', icon: 'wrench' as const,  roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
+    { href: '/traitements',   key: 'traitements',  icon: 'flask' as const,    roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
+    { href: '/bassins',       key: 'bassins',      icon: 'pool' as const,     roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur', 'controleur_ars'] },
+    { href: '/contacts',      key: 'contacts',     icon: 'phone' as const,    roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'responsable_saisie', 'visualisateur'] },
+    { href: '/statistiques',  key: 'statistiques', icon: 'chart' as const,    roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'visualisateur', 'controleur_ars'] },
+    { href: '/historique',    key: 'historique',   icon: 'calendar' as const, roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'controleur_ars'] },
+    { href: '/export-pdf',    key: 'export_pdf',   icon: 'download' as const, roles: ['superadmin', 'responsable_organisme', 'responsable_groupe', 'responsable_etablissement', 'controleur_ars'] },
+    { href: '/mes-etablissements', key: 'mes_etablissements', icon: 'building' as const, roles: ['superadmin', 'responsable_groupe', 'responsable_organisme'] },
+    { href: '/etablissement', key: 'etablissement',icon: 'building' as const, roles: ['responsable_etablissement'] },
+    { href: '/abonnement',    key: 'abonnement',   icon: 'creditCard' as const, roles: ['superadmin', 'responsable_organisme', 'responsable_etablissement'] },
   ]
 
   const navItems = allNavItems.filter(item => role ? item.roles.includes(role) : false)
@@ -67,10 +68,10 @@ export default function Sidebar({ open, onClose, alertCount = 0 }: SidebarProps)
       {open && <div className="sidebar-overlay" onClick={onClose} />}
       <nav className={`sidebar${open ? ' open' : ''}`}>
         {/* Logo */}
-        <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(255,255,255,0.25)', background: 'rgba(0,0,0,0.08)' }}>
-          <Image src="/assets/logo-cifec-transparent.png" alt="CIFEC" width={120} height={44}
-            style={{ height: 44, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)' }} priority />
-          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 8 }}>
+        <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(255,255,255,0.25)', background: 'rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Image src="/assets/logo-cifec-transparent.png" alt="CIFEC" width={160} height={56}
+            style={{ height: 52, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)', imageRendering: 'auto' }} priority />
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 8, textAlign: 'center' }}>
             {lang === 'fr' ? 'Carnet sanitaire numérique' : 'Digital sanitary record'}
           </div>
         </div>

@@ -117,7 +117,7 @@ export default async function PreviewBassins() {
                         background: b.typeMesure === 'ponctuelle' ? '#d1fae5' : '#fef3c7',
                         color: b.typeMesure === 'ponctuelle' ? '#065f46' : '#92400e',
                       }}>
-                        Mesure : {b.typeMesure === 'ponctuelle' ? '📋 Réglementaire (ponctuelle)' : '⚙️ Analyse en continu'}
+                        Mesure : {b.typeMesure === 'ponctuelle' ? 'Réglementaire (ponctuelle)' : 'Analyse en continu'}
                       </span>
                     )}
                   </div>

@@ -80,7 +80,7 @@ function MesureBadge({ typeMesure }: { typeMesure: string | null }) {
       color: isRegl ? '#10b981' : '#d97706',
       border: `1px solid ${isRegl ? '#10b98144' : '#f59e0b44'}`,
     }}>
-      {isRegl ? '📋 Réglementaire' : '⚙️ Analyse en continu'}
+      {isRegl ? 'Réglementaire' : 'Analyse en continu'}
     </span>
   )
 }
@@ -106,10 +106,10 @@ function ComparisonPanel() {
               Critère
             </th>
             <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, fontSize: 12, color: '#10b981', borderBottom: '2px solid #10b98133', background: '#10b98108', whiteSpace: 'nowrap' }}>
-              📋 Mesure réglementaire (ponctuelle)
+              Mesure réglementaire (ponctuelle)
             </th>
             <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, fontSize: 12, color: '#d97706', borderBottom: '2px solid #f59e0b33', background: '#f59e0b08', whiteSpace: 'nowrap', borderRadius: '0 8px 0 0' }}>
-              ⚙️ Analyse en continu (non réglementaire)
+              Analyse en continu (non réglementaire)
             </th>
           </tr>
         </thead>
@@ -304,8 +304,8 @@ export default function BassinsClient({ initialData }: Props) {
               color: form.typeMesure === 'ponctuelle' ? '#10b981' : form.typeMesure === 'analyseur' ? '#d97706' : undefined,
             }}>
               <option value="">— Non renseigné —</option>
-              <option value="ponctuelle">📋 Mesure ponctuelle (réglementaire)</option>
-              <option value="analyseur">⚙️ Analyse en continu (non réglementaire)</option>
+              <option value="ponctuelle">Mesure ponctuelle (réglementaire)</option>
+              <option value="analyseur">Analyse en continu (non réglementaire)</option>
             </select>
           </div>
 
@@ -388,7 +388,7 @@ export default function BassinsClient({ initialData }: Props) {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#10b98118', color: '#10b981', border: '1px solid #10b98133' }}>📋 Réglementaire</span>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#10b98118', color: '#10b981', border: '1px solid #10b98133' }}>Réglementaire</span>
             <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#f59e0b18', color: '#d97706', border: '1px solid #f59e0b33' }}>⚙️ Analyse en continu</span>
             <span style={{ display: 'flex', transform: showComparison ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
               <Icon name="chevronDown" size={16} color="var(--text3)" />

@@ -1,17 +1,19 @@
-export type Role = 'superadmin' | 'admin' | 'responsable_etablissement' | 'responsable_saisie' | 'visualisateur' | 'controleur_ars'
+export type Role = 'superadmin' | 'responsable_groupe' | 'responsable_organisme' | 'responsable_etablissement' | 'responsable_saisie' | 'visualisateur' | 'controleur_ars'
 
 export const ROLE_LABELS: Record<Role, { fr: string; en: string }> = {
-  superadmin:                { fr: 'Super Admin',          en: 'Super Admin' },
-  admin:                     { fr: 'Admin',                en: 'Admin' },
+  superadmin:                { fr: 'Super Admin',                en: 'Super Admin' },
+  responsable_groupe:        { fr: 'Responsable de Groupe',      en: 'Group Manager' },
+  responsable_organisme:     { fr: "Responsable d'Organisme",    en: 'Organisation Manager' },
   responsable_etablissement: { fr: "Responsable d'Établissement", en: 'Establishment Manager' },
-  responsable_saisie:        { fr: 'Responsable de Saisie',       en: 'Data Entry' },
-  visualisateur:             { fr: 'Auditeur',                    en: 'Auditor' },
-  controleur_ars:            { fr: 'Contrôleur ARS',              en: 'ARS Inspector' },
+  responsable_saisie:        { fr: 'Responsable de Saisie',      en: 'Data Entry' },
+  visualisateur:             { fr: 'Auditeur',                   en: 'Auditor' },
+  controleur_ars:            { fr: 'Contrôleur ARS',             en: 'ARS Inspector' },
 }
 
 export const ROLE_COLORS: Record<Role, string> = {
   superadmin:                '#9333ea',
-  admin:                     '#00aeef',
+  responsable_groupe:        '#0097A7',
+  responsable_organisme:     '#00aeef',
   responsable_etablissement: '#10b981',
   responsable_saisie:        '#f97316',
   visualisateur:             '#6b7280',
@@ -22,17 +24,17 @@ export const ROLE_COLORS: Record<Role, string> = {
 
 /** Saisir relevés et interventions */
 export function peutSaisir(role: Role) {
-  return ['admin', 'responsable_etablissement', 'responsable_saisie'].includes(role)
+  return ['responsable_groupe', 'responsable_organisme', 'responsable_etablissement', 'responsable_saisie'].includes(role)
 }
 
 /** Modifier toute donnée */
 export function peutModifier(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement', 'responsable_saisie'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement', 'responsable_saisie'].includes(role)
 }
 
 /** Valider un relevé */
 export function peutValider(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement'].includes(role)
 }
 
 /** Supprimer un relevé (document réglementaire — superadmin uniquement) */
@@ -47,27 +49,27 @@ export function estControleurARS(role: Role) {
 
 /** Supprimer autres données (interventions, contacts, bassins…) */
 export function peutSupprimer(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement'].includes(role)
 }
 
 /** Gérer les utilisateurs */
 export function peutGererUtilisateurs(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement'].includes(role)
 }
 
 /** Voir statistiques et historique */
 export function peutVoirStats(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement', 'visualisateur', 'controleur_ars'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement', 'visualisateur', 'controleur_ars'].includes(role)
 }
 
 /** Sauvegarder et restaurer */
 export function peutSauvegarder(role: Role) {
-  return ['superadmin', 'admin', 'responsable_etablissement'].includes(role)
+  return ['superadmin', 'responsable_groupe', 'responsable_organisme', 'responsable_etablissement'].includes(role)
 }
 
 /** Paramètres établissement */
 export function peutGererEtab(role: Role) {
-  return ['admin', 'responsable_etablissement'].includes(role)
+  return ['responsable_groupe', 'responsable_organisme', 'responsable_etablissement'].includes(role)
 }
 
 /** Section debug superadmin */

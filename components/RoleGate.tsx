@@ -52,7 +52,7 @@ export function SuperAdminOnly({ children }: Props) {
 export function CanManageConfig({ children }: Props) {
   const { user } = useAuth()
   const role = user?.role ?? ''
-  return ['superadmin', 'admin', 'responsable_etablissement'].includes(role) ? <>{children}</> : null
+  return ['superadmin', 'responsable_organisme', 'responsable_etablissement'].includes(role) ? <>{children}</> : null
 }
 
 export function CanValider({ children }: Props) {

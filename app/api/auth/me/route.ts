@@ -8,6 +8,9 @@ export async function GET(req: NextRequest) {
   if (!token) return NextResponse.json({ user: null })
   const session = parseSessionToken(token)
   if (!session) return NextResponse.json({ user: null })
-  const user = await prisma.user.findUnique({ where: { username: session.username }, select: { username: true, role: true, nom: true } }).catch(() => null)
+  const user = await prisma.user.findUnique({
+    where: { username: session.username },
+    select: { username: true, role: true, nom: true, etablissementId: true },
+  }).catch(() => null)
   return NextResponse.json({ user })
 }
