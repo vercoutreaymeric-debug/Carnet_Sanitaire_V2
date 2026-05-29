@@ -43,13 +43,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(d.user)
         setLoading(false)
         // Session expirée / utilisateur supprimé → redirect login
-        if (!d.user && pathname !== '/login') {
+        const isPublic = pathname === '/login' || pathname.startsWith('/inscription')
+        if (!d.user && !isPublic) {
           router.replace(`/login?from=${encodeURIComponent(pathname)}`)
         }
       })
       .catch(() => {
         setLoading(false)
-        if (pathname !== '/login') router.replace('/login')
+        const isPublic = pathname === '/login' || pathname.startsWith('/inscription')
+        if (!isPublic) router.replace('/login')
       })
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
