@@ -155,7 +155,7 @@ function MiniKpis({ etabs }: { etabs: Etab[] }) {
 
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text2)' }}>{etabs.length} étab.</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text2)' }}>{etabs.length} établissement{etabs.length !== 1 ? 's' : ''}</span>
       {actifs > 0  && <span style={{ fontSize: 11, background: '#10b98115', color: '#10b981', borderRadius: 10, padding: '1px 8px', fontWeight: 600 }}>{actifs} actif{actifs > 1 ? 's' : ''}</span>}
       {essais > 0  && <span style={{ fontSize: 11, background: '#f59e0b15', color: '#f59e0b', borderRadius: 10, padding: '1px 8px', fontWeight: 600 }}>{essais} essai{essais > 1 ? 's' : ''}</span>}
       {expires > 0 && <span style={{ fontSize: 11, background: '#ef444415', color: '#ef4444', borderRadius: 10, padding: '1px 8px', fontWeight: 600 }}>{expires} expire bientôt</span>}
@@ -313,7 +313,7 @@ export default function SuperAdminAbonnements({ etablissements, groupes, organis
                             {(TYPE_ORGANISME[o.type]?.label ?? o.type).toUpperCase()}
                           </span>
                           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{o.nom}</span>
-                          <span style={{ fontSize: 11, color: 'var(--text3)' }}>{o.etablissements.length} étab.</span>
+                          <span style={{ fontSize: 11, color: 'var(--text3)' }}>{o.etablissements.length} établissement{o.etablissements.length !== 1 ? 's' : ''}</span>
                         </div>
                         {/* Tableau des étabs de cet organisme */}
                         {o.etablissements.length > 0 && (

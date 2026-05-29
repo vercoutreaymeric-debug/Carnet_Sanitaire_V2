@@ -238,15 +238,15 @@ export default function GroupeView({ groupe, organismes: initOrgs, groupeId }: {
                 !groupe && org.groupe ? `Groupe : ${org.groupe.nom}` : null,
                 org.adresse || null,
                 org.telephone || null,
-                org.users[0] ? `Resp : ${org.users[0].nom || org.users[0].username}` : null,
+                org.users[0] ? `Responsable : ${org.users[0].nom || org.users[0].username}` : null,
               ].filter(Boolean).join(' · ')}
               tags={[
                 !groupe && org.groupe ? { text: org.groupe.nom, bg: 'rgba(0,151,167,0.6)' } : null,
-                { text: `${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.25)' },
+                { text: `${org.etablissements.length} établissement${org.etablissements.length !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.25)' },
               ].filter(Boolean) as { text: string; bg: string }[]}
               color={C_ORG}
               indent={INDENT}
-              addButton={<ActionBtn onClick={() => setCreateEtabOrgId(org.id)} label="+ Étab" />}
+              addButton={<ActionBtn onClick={() => setCreateEtabOrgId(org.id)} label="+ Établissement" />}
               actions={<>
                 <ActionBtn onClick={() => { setEditOrg(org); setEditOrgForm({ nom: org.nom, type: org.type, adresse: org.adresse, telephone: org.telephone }) }} label="Modifier" />
                 <ActionBtn onClick={() => setDeleteOrg(org)} label="🗑" danger />
@@ -266,9 +266,9 @@ export default function GroupeView({ groupe, organismes: initOrgs, groupeId }: {
                   tags={[
                     etab.abonnement ? { text: etab.abonnement.plan, bg: 'rgba(147,51,234,0.6)' } : null,
                     etab.abonnement ? { text: etab.abonnement.statut, bg: 'rgba(255,255,255,0.2)' } : null,
-                    { text: `${etab._count.users}u`, bg: 'rgba(255,255,255,0.15)' },
-                    { text: `${etab._count.bassins}b`, bg: 'rgba(255,255,255,0.15)' },
-                    { text: `${etab._count.releves}r`, bg: 'rgba(255,255,255,0.15)' },
+                    { text: `${etab._count.users} utilisateur${etab._count.users !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.15)' },
+                    { text: `${etab._count.bassins} bassin${etab._count.bassins !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.15)' },
+                    { text: `${etab._count.releves} relevé${etab._count.releves !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.15)' },
                   ].filter(Boolean) as { text: string; bg: string }[]}
                   color={sc}
                   indent={INDENT * 2}

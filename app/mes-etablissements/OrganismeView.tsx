@@ -211,7 +211,7 @@ export default function OrganismeView({
                     </div>
                   </div>
                   <div style={{ padding: '8px 16px', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 12, color: 'var(--text2)' }}>👤 <b>{etab._count.users}</b> user(s)</span>
+                    <span style={{ fontSize: 12, color: 'var(--text2)' }}>👤 <b>{etab._count.users}</b> utilisateur(s)</span>
                     <span style={{ fontSize: 12, color: 'var(--text2)' }}>🏊 <b>{etab._count.bassins}</b> bassin(s)</span>
                     <span style={{ fontSize: 12, color: 'var(--text2)' }}>📊 <b>{etab._count.releves}</b> relevé(s)</span>
                   </div>

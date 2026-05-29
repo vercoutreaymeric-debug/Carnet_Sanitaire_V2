@@ -24,10 +24,10 @@ interface Bassin {
 // ─── Couleurs ─────────────────────────────────────────────────────────────────
 const ROLE_LABEL: Record<string, string> = {
   superadmin: 'Super Admin',
-  responsable_groupe: 'Resp. Groupe',
-  responsable_organisme: 'Resp. Organisme',
-  responsable_etablissement: 'Resp. Établissement',
-  responsable_saisie: 'Resp. Saisie',
+  responsable_groupe: 'Responsable Groupe',
+  responsable_organisme: 'Responsable Organisme',
+  responsable_etablissement: 'Responsable Établissement',
+  responsable_saisie: 'Responsable Saisie',
   visualisateur: 'Auditeur',
   controleur_ars: 'Contrôleur ARS',
 }
