@@ -11,7 +11,7 @@ export default async function BassinsPage() {
   // Filtre selon le rôle
   let where: Record<string, unknown> = {}
   if (session.role === 'superadmin') {
-    where = {} // Voit tout
+    where = {}
   } else if (session.role === 'responsable_groupe' && session.groupeId) {
     where = { etablissement: { organisme: { groupeId: session.groupeId } } }
   } else if (session.role === 'responsable_organisme' && session.organismeId) {
@@ -21,9 +21,24 @@ export default async function BassinsPage() {
   }
 
   const bassins = await prisma.bassin.findMany({
-    where,
-    orderBy: { createdAt: 'asc' },
+    where, orderBy: { createdAt: 'asc' },
   }).catch(() => [])
 
-  return <BassinsClient initialData={JSON.parse(JSON.stringify(bassins))} />
+  // Pour les rôles multi-étab : charger la liste des établissements accessibles
+  let etabsDisponibles: { id: number; nom: string }[] = []
+  if (session.role === 'superadmin') {
+    etabsDisponibles = await prisma.etablissement.findMany({ select: { id: true, nom: true }, orderBy: { nom: 'asc' } }).catch(() => [])
+  } else if (session.role === 'responsable_groupe' && session.groupeId) {
+    etabsDisponibles = await prisma.etablissement.findMany({ where: { organisme: { groupeId: session.groupeId } }, select: { id: true, nom: true }, orderBy: { nom: 'asc' } }).catch(() => [])
+  } else if (session.role === 'responsable_organisme' && session.organismeId) {
+    etabsDisponibles = await prisma.etablissement.findMany({ where: { organismeId: session.organismeId }, select: { id: true, nom: true }, orderBy: { nom: 'asc' } }).catch(() => [])
+  }
+
+  return (
+    <BassinsClient
+      initialData={JSON.parse(JSON.stringify(bassins))}
+      etabsDisponibles={JSON.parse(JSON.stringify(etabsDisponibles))}
+      userRole={session.role}
+    />
+  )
 }

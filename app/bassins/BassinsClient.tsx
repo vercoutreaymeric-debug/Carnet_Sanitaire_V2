@@ -11,7 +11,11 @@ import QRModal from '@/components/QRModal'
 import { CanManageConfig, CanDelete } from '@/components/RoleGate'
 import type { Bassin } from '@/types'
 
-interface Props { initialData: Bassin[] }
+interface Props {
+  initialData: Bassin[]
+  etabsDisponibles?: { id: number; nom: string }[]
+  userRole?: string
+}
 
 const emptyForm = {
   nom: '', type: 'couvert', typeReglementaire: '', mineralisationEau: 'normale',
@@ -130,12 +134,13 @@ function ComparisonPanel() {
   )
 }
 
-export default function BassinsClient({ initialData }: Props) {
+export default function BassinsClient({ initialData, etabsDisponibles = [], userRole }: Props) {
   const [bassins, setBassins] = useState<Bassin[]>(initialData)
   const [editing, setEditing] = useState<number | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
   const [newForm, setNewForm] = useState<BassinForm>(emptyForm)
+  const [selectedEtabId, setSelectedEtabId] = useState<string>(etabsDisponibles[0]?.id?.toString() ?? '')
   const [editForms, setEditForms] = useState<Record<number, BassinForm>>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -173,10 +178,12 @@ export default function BassinsClient({ initialData }: Props) {
 
   const handleCreate = async () => {
     if (!newForm.nom.trim()) return
+    if (etabsDisponibles.length > 0 && !selectedEtabId) { setError('Veuillez sélectionner un établissement.'); return }
     setSaving(true)
     setError(null)
+    const body = etabsDisponibles.length > 0 ? { ...newForm, etablissementId: selectedEtabId } : newForm
     try {
-      const res = await fetch('/api/bassins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newForm) })
+      const res = await fetch('/api/bassins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? `Erreur ${res.status}`); return }
       setBassins(bs => [...bs, data as Bassin])
@@ -514,6 +521,21 @@ export default function BassinsClient({ initialData }: Props) {
               <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text2)', padding: 4 }}><Icon name="close" size={20} /></button>
             </div>
             <div style={{ padding: 24 }}>
+              {etabsDisponibles.length > 0 && (
+                <div style={{ marginBottom: 18, padding: '12px 16px', background: 'var(--surface2)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)', display: 'block', marginBottom: 6 }}>
+                    Établissement *
+                  </label>
+                  <select
+                    value={selectedEtabId}
+                    onChange={e => setSelectedEtabId(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)', fontSize: 13 }}
+                  >
+                    <option value="">— Sélectionner un établissement —</option>
+                    {etabsDisponibles.map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
+                  </select>
+                </div>
+              )}
               <FormGrid form={newForm} upd={updNew} />
               {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 12, padding: '8px 12px', background: 'var(--red)11', borderRadius: 8 }}>{error}</p>}
               <div style={{ display: 'flex', gap: 10, marginTop: 22, justifyContent: 'flex-end' }}>

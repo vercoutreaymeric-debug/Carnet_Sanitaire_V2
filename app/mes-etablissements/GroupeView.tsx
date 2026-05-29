@@ -38,29 +38,42 @@ const inp = (s?: React.CSSProperties): React.CSSProperties => ({
 
 // ─── Barre cascade ────────────────────────────────────────────────────────────
 function CascadeBar({
-  label, sublabel, color, indent, actions, addButton,
+  label, sublabel, tags, color, indent, actions, addButton, level,
 }: {
   label: string
   sublabel?: string
+  tags?: { text: string; bg: string }[]
   color: string
   indent: number
+  level: 'groupe' | 'organisme' | 'etablissement'
   actions?: React.ReactNode
   addButton?: React.ReactNode
 }) {
+  const sizes = { groupe: { pad: '10px 16px', font: 15, sub: 12 }, organisme: { pad: '8px 14px', font: 13, sub: 11 }, etablissement: { pad: '7px 13px', font: 12, sub: 10 } }
+  const s = sizes[level]
   return (
-    <div style={{ marginLeft: indent, marginBottom: 6 }}>
+    <div style={{ marginLeft: indent, marginBottom: 4 }}>
       <div style={{
         background: color,
-        borderRadius: 9,
-        padding: '10px 14px 10px 18px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-        boxShadow: `0 2px 8px ${color}44`,
+        borderRadius: 8,
+        padding: s.pad,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+        boxShadow: `0 1px 6px ${color}50`,
       }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', lineHeight: 1.2 }}>{label}</p>
-          {sublabel && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>{sublabel}</p>}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ fontWeight: 700, fontSize: s.font, color: '#fff', lineHeight: 1.2 }}>{label}</p>
+            {sublabel && <p style={{ fontSize: s.sub, color: 'rgba(255,255,255,0.78)', marginTop: 1 }}>{sublabel}</p>}
+          </div>
+          {tags && tags.length > 0 && (
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {tags.map((t, i) => (
+                <span key={i} style={{ fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 20, background: t.bg, color: '#fff' }}>{t.text}</span>
+              ))}
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
           {addButton}
           {actions}
         </div>
@@ -72,10 +85,10 @@ function CascadeBar({
 function ActionBtn({ onClick, label, danger }: { onClick: () => void; label: string; danger?: boolean }) {
   return (
     <button onClick={onClick} style={{
-      background: danger ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.2)',
-      border: 'none', borderRadius: 6,
-      padding: '4px 10px', cursor: 'pointer',
-      fontSize: 11, color: '#fff', fontWeight: 600,
+      background: danger ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.18)',
+      border: danger ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.25)',
+      borderRadius: 6, padding: '3px 9px', cursor: 'pointer',
+      fontSize: 11, color: '#fff', fontWeight: 600, whiteSpace: 'nowrap',
     }}>{label}</button>
   )
 }
@@ -205,42 +218,57 @@ export default function GroupeView({ groupe, organismes: initOrgs, groupeId }: {
 
         {/* Niveau 0 — Groupe */}
         <CascadeBar
+          level="groupe"
           label={groupe?.nom ?? 'Mon périmètre'}
-          sublabel={`${organismes.length} organisme${organismes.length !== 1 ? 's' : ''} · ${allEtabs.length} établissement${allEtabs.length !== 1 ? 's' : ''}`}
+          sublabel={`${organismes.length} organisme${organismes.length !== 1 ? 's' : ''} · ${allEtabs.length} établissement${allEtabs.length !== 1 ? 's' : ''} · ${allEtabs.reduce((s, e) => s + e._count.bassins, 0)} bassin(s)`}
           color={C_GROUPE}
           indent={0}
-          addButton={
-            <ActionBtn onClick={() => setShowCreateOrg(true)} label="+ Organisme" />
-          }
+          addButton={<ActionBtn onClick={() => setShowCreateOrg(true)} label="+ Organisme" />}
         />
 
         {/* Niveau 1 — Organismes */}
         {organismes.map(org => (
           <div key={org.id}>
             <CascadeBar
+              level="organisme"
               label={org.nom}
-              sublabel={`${org.type} · ${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}${org.users[0] ? ` · ${org.users[0].nom || org.users[0].username}` : ''}`}
+              sublabel={[
+                org.type,
+                org.adresse || null,
+                org.telephone || null,
+                org.users[0] ? `Resp : ${org.users[0].nom || org.users[0].username}` : null,
+              ].filter(Boolean).join(' · ')}
+              tags={[{ text: `${org.etablissements.length} étab${org.etablissements.length !== 1 ? 's' : ''}`, bg: 'rgba(255,255,255,0.25)' }]}
               color={C_ORG}
               indent={INDENT}
               addButton={<ActionBtn onClick={() => setCreateEtabOrgId(org.id)} label="+ Étab" />}
               actions={<>
-                <ActionBtn onClick={() => { setEditOrg(org); setEditOrgForm({ nom: org.nom, type: org.type, adresse: org.adresse, telephone: org.telephone }) }} label="✏️" />
+                <ActionBtn onClick={() => { setEditOrg(org); setEditOrgForm({ nom: org.nom, type: org.type, adresse: org.adresse, telephone: org.telephone }) }} label="Modifier" />
                 <ActionBtn onClick={() => setDeleteOrg(org)} label="🗑" danger />
               </>}
             />
 
             {/* Niveau 2 — Établissements */}
             {org.etablissements.map(etab => {
-              const sc = etab.abonnement ? (STATUT_COLOR[etab.abonnement.statut] ?? '#10b981') : '#10b981'
+              const sc = etab.abonnement ? (STATUT_COLOR[etab.abonnement.statut] ?? C_ETAB) : C_ETAB
+              const expire = etab.abonnement ? new Date(etab.abonnement.dateExpiration).toLocaleDateString('fr-FR') : null
               return (
                 <CascadeBar
                   key={etab.id}
+                  level="etablissement"
                   label={etab.nom}
-                  sublabel={`${etab.abonnement ? `${etab.abonnement.plan} · ${etab.abonnement.statut} · ` : ''}${etab._count.users} user · ${etab._count.bassins} bassin · ${etab._count.releves} relevé`}
+                  sublabel={[etab.adresse || null, etab.telephone || null, expire ? `Expire ${expire}` : null].filter(Boolean).join(' · ')}
+                  tags={[
+                    etab.abonnement ? { text: etab.abonnement.plan, bg: 'rgba(147,51,234,0.6)' } : null,
+                    etab.abonnement ? { text: etab.abonnement.statut, bg: 'rgba(255,255,255,0.2)' } : null,
+                    { text: `${etab._count.users}u`, bg: 'rgba(255,255,255,0.15)' },
+                    { text: `${etab._count.bassins}b`, bg: 'rgba(255,255,255,0.15)' },
+                    { text: `${etab._count.releves}r`, bg: 'rgba(255,255,255,0.15)' },
+                  ].filter(Boolean) as { text: string; bg: string }[]}
                   color={sc}
                   indent={INDENT * 2}
                   actions={<>
-                    <ActionBtn onClick={() => { setEditEtab({ orgId: org.id, etab }); setEditEtabForm({ nom: etab.nom, adresse: etab.adresse, telephone: etab.telephone }) }} label="✏️" />
+                    <ActionBtn onClick={() => { setEditEtab({ orgId: org.id, etab }); setEditEtabForm({ nom: etab.nom, adresse: etab.adresse, telephone: etab.telephone }) }} label="Modifier" />
                     <ActionBtn onClick={() => setDeleteEtab({ orgId: org.id, etab })} label="🗑" danger />
                   </>}
                 />
